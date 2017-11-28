@@ -26,7 +26,7 @@ var _cal = (function (cal) {
     }
 
     var layout = function (f,o) {
-        var b, h, t, c, l, r, d = document;
+        var b, h, t, c, l, r, tooltip, d = document;
         var row = [], col = [] , span = [], heads = [];
         var weekendSimple = ['Sun', 'Mon', 'The', 'Wen', 'Thu', 'Fri', 'Set'];
 
@@ -38,21 +38,30 @@ var _cal = (function (cal) {
                 weekendSimple = o.weekendSimple;
             }
         }
-        
-        // div create
+
+        /* div create */
         b = f.el.appendChild(d.createElement('div'));
 
+        /* mouse event option */
         b.ondragstart = function () {return false}
         b.onselectstart = function () {return false}
         // body.oncontextmenu = function () {return false}
+
+        /* version alert */
+        tooltip = d.createElement('span')
+        tooltip.classList.add('tooltip');
+        tooltip.innerText = o.version;
+        b.appendChild(tooltip)
     
         b.classList.add('calendar-body');
 
         l = d.createElement('div');
         l.classList.add('calendar-btn-left');
+        l.id = 'left-btn';
 
         r = d.createElement('div');
         r.classList.add('calendar-btn-right');
+        r.id = 'right-btn';
 
         c = d.createElement('div');
         c.classList.add('calendar');
@@ -220,7 +229,7 @@ var _cal = (function (cal) {
             }
         }
         
-        function dayAction (binder, op) {
+        function clickActive (binder, op) {
             binder.addEventListener('click', function (e) {
                 var attr = this.parentNode;
 
@@ -248,12 +257,12 @@ var _cal = (function (cal) {
                 }
                 binder.parentNode.classList.add('active')
         
-                /* If the dayAction option is set  */
-                if(op.dayAction != undefined){
-                    if(typeof op.dayAction === 'function'){
-                        op.dayAction(f);
+                /* If the clickActive option is set  */
+                if(op.clickActive != undefined){
+                    if(typeof op.clickActive === 'function'){
+                        op.clickActive(f);
                     }else{
-                        onError('The dayActions type must be a "function".')
+                        onError('The clickActives type must be a "function".')
                     }
                 }
                  
@@ -287,7 +296,7 @@ var _cal = (function (cal) {
 
         var special = specialFilter(this);
         var el = element(this);
-        var action = dayAction;
+        var action = clickActive;
         var data = setLoopLimit
 
         return {
@@ -314,12 +323,13 @@ var _cal = (function (cal) {
         var specialDay = []
         var startPoint = 0;
         var renderDay = 1;
+        var title = "<span class='title-y'>"+func.format($_td , 'yyyy')+"</span> <span class='title-m'>"+mm+"</span>";
 
         o.full = $_td.year+'/'+$_td.month+'/'+$_td.day
         
         layout_complate.body.setAttribute('full-day', o.full)
-
-        layout_complate.title[0].innerHTML = "<span class='title-y'>"+func.format($_td , 'yyyy')+"</span> <span class='title-m'>"+mm+"</span>";        
+    
+        layout_complate.title[0].innerHTML = title
 
         for(var _fs in func.special){
             if(_fs === mm){
@@ -349,10 +359,16 @@ var _cal = (function (cal) {
 
                 /* before day unable option */
                 if (o.unabledDay == true) {
-                    if (renderDay < $_nd.day && $_td.month <= $_nd.month && $_td.year <= $_nd.year) {  
-                        layout_complate.col[i][j].classList.add('unable')
+                    if ($_td.year <= $_nd.year && ($_td.month <= $_nd.month && $_nd.month <= 12)) {  
+                        if(renderDay >= $_nd.day && $_td.month == $_nd.month && $_td.year >= $_nd.year){
+                            layout_complate.col[i][j].classList.remove('unable')
+                        }else{
+                            layout_complate.col[i][j].classList.add('unable') 
+                        }
                     }else{
-                        layout_complate.col[i][j].classList.remove('unable')
+                        if($_td.year >= $_nd.year || ($_td.month <= $_nd.month && $_nd.month <= 12)) {
+                            layout_complate.col[i][j].classList.remove('unable') 
+                        }
                     }
                 }
 
@@ -428,6 +444,7 @@ var _cal = (function (cal) {
         this.setDate();
 
         option.prevSpecial = new Array();
+        option.version = '0.1.5 version';
         propLuncher(option)
         
         var func = this.fn();

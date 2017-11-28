@@ -29,6 +29,18 @@
 <script>
     _cal.setup({
         el: '#app',
+        specialDay : {
+            '11-27' : '하루전',
+            '11-29' : '내일',
+        },
+        titleComstom : {
+            left : "<div id='left-btn'>이전달</div>",
+            center : "<div class='calendar'>{yyyy년 mm월}</div>",
+            right: "<div id='right-btn'>다음달</div>"
+        },
+        unabledDay: true
     })
+
+    console.log(_cal)
 </script>
 </html>
