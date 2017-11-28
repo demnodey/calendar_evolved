@@ -8,6 +8,8 @@ var _cal = (function (cal) {
 
     function Calendar () {
         this.methods = {}
+        this.version = '0.1.6 version';
+        this.prevSpecial = new Array();
     }
 
     // 내부 데이터 활용
@@ -25,7 +27,7 @@ var _cal = (function (cal) {
         }
     }
 
-    var layout = function (f,o) {
+    var layout = function (f,o,self) {
         var b, h, t, c, l, r, tooltip, d = document;
         var row = [], col = [] , span = [], heads = [];
         var weekendSimple = ['Sun', 'Mon', 'The', 'Wen', 'Thu', 'Fri', 'Set'];
@@ -50,7 +52,7 @@ var _cal = (function (cal) {
         /* version alert */
         tooltip = d.createElement('span')
         tooltip.classList.add('tooltip');
-        tooltip.innerText = o.version;
+        tooltip.innerText = self.version;
         b.appendChild(tooltip)
     
         b.classList.add('calendar-body');
@@ -443,12 +445,10 @@ var _cal = (function (cal) {
         var self = this;
         this.setDate();
 
-        option.prevSpecial = new Array();
-        option.version = '0.1.5 version';
         propLuncher(option)
         
         var func = this.fn();
-        layout_complate = layout(func,option);
+        layout_complate = layout(func,option,this);
 
         this.methods = {
             b : this.btn(),
