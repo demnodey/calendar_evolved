@@ -8,7 +8,7 @@ var _cal = (function (cal) {
 
     function Calendar () {
         this.methods = {}
-        this.version = '0.1.6 version';
+        this.version = '0.1.7 version';
         this.prevSpecial = new Array();
     }
 
@@ -218,14 +218,38 @@ var _cal = (function (cal) {
             return perfect_date;
         }
 
-        function setLoopLimit () {
+        function setLoopLimit (prev, next) {
             var props = self.transformDate;
+
+            var prevProps = function () {
+                var these = {py : props.year, pm : props.month - 1};
+                if( these.pm < 1 ){
+                    these.py = props.year - 1;
+                    these.pm =  12
+                }
+                return 32 - new Date(these.py, these.pm - 1, 32).getDate();
+            }
+
+            var nextProps = function () {
+                var these = {ny : props.year, nm : props.month + 1};
+                if( these.nm > 12 ){
+                    these.ny = props.year + 1;
+                    these.nm =  1
+                }
+
+                return 32 - new Date(these.ny, these.nm - 1, 32).getDate();
+            }
+
             var lastday = 32 - new Date(props.year, props.month -1, 32).getDate();
             var startday = new Date(props.year, props.month -1, 1).getDay();
+            
             // var loop = Math.floor((lastday - (7 - startday)) / 7) + 1;
             // var piece = (lastday - startday) % 7
             // if (piece != 0) { loop += 1; }
+
             return {
+                prevlastday : prevProps(),
+                nextlastday : nextProps(),
                 lastday: lastday,
                 startday: startday
             }
@@ -318,14 +342,17 @@ var _cal = (function (cal) {
         var o = option;
         var $_nd = this.nowDate;
         var $_td = this.transformDate;
+        var yy = func.format($_td , 'yyyy');
         var mm = func.format($_td , 'mm');
+        var sed = func.data();  // start end data
 
         var attr = false;
         var includeMonth = false;
         var specialDay = []
         var startPoint = 0;
         var renderDay = 1;
-        var title = "<span class='title-y'>"+func.format($_td , 'yyyy')+"</span> <span class='title-m'>"+mm+"</span>";
+        var prevRenderDay = sed.startday == 0 ?  sed.prevlastday - 7 : sed.prevlastday - sed.startday;
+        var title = "<span class='title-y'>"+yy+"</span> <span class='title-m'>"+mm+"</span>";
 
         o.full = $_td.year+'/'+$_td.month+'/'+$_td.day
         
@@ -351,13 +378,6 @@ var _cal = (function (cal) {
 
         for(var i = 0; i < layout_complate.row.length; i++){
             for(var j = 0; j < layout_complate.span[0].length; j++){
-
-                /* today position option */
-                if(renderDay === $_nd.day && $_td.month == $_nd.month && $_td.year == $_nd.year){
-                    layout_complate.col[i][j].classList.add('active', 'today')
-                }else{
-                    layout_complate.col[i][j].classList.remove('active', 'today')
-                }
 
                 /* before day unable option */
                 if (o.unabledDay == true) {
@@ -391,21 +411,35 @@ var _cal = (function (cal) {
                 layout_complate.span[i][j].innerText = ''
                 layout_complate.col[i][j].classList.remove('special-day')
 
-                if(func.data().startday == 0) {
+                if(sed.startday == 0) {
+                    prevRenderDay++
+                    layout_complate.col[i][j].classList.add('unable')
+                    layout_complate.span[i][j].innerText = prevRenderDay;
                     startPoint = 1;
                 }
                 
                 if(i == startPoint){
-                    if(func.data().startday <= j){
+                    if(sed.startday <= j){
                         attr = true;
                         layout_complate.span[i][j].innerText = renderDay;
+                    } else {
+                        prevRenderDay++
+                        layout_complate.col[i][j].classList.add('unable')
+                        layout_complate.span[i][j].innerText = prevRenderDay;
                     }
                 }else if(i > startPoint){
-                    if(func.data().lastday >= renderDay){
+                    if(sed.lastday >= renderDay){
                         layout_complate.span[i][j].innerText = renderDay;
                     }else{  
                         attr = false
                     }
+                }
+
+                /* today position option */
+                if(renderDay === $_nd.day && $_td.month == $_nd.month && $_td.year == $_nd.year && attr == true){
+                    layout_complate.col[i][j].classList.add('active', 'today')
+                }else{
+                    layout_complate.col[i][j].classList.remove('active', 'today')
                 }
 
                 /* special-day render */
@@ -427,6 +461,7 @@ var _cal = (function (cal) {
                 func.hasClass(layout_complate.col[i][j]) 
                 
                 if (attr == true) {  
+                    layout_complate.col[i][j].classList.remove('unable')
                     layout_complate.col[i][j].setAttribute('date-year', $_td.year)
                     layout_complate.col[i][j].setAttribute('date-month', $_td.month)
                     layout_complate.col[i][j].setAttribute('date-day', renderDay)
