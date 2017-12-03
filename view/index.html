@@ -29,6 +29,14 @@
 <script>
     _cal.setup({
         el: '#app',
+        specialDay : {
+            '12-04' : '0.1.7',
+            '12-05' : 'ver',
+            '12-06' : '업데이트'
+        },
+        clickActive: function (day) {
+            console.log(day);
+        }
     })
 
     console.log(_cal)

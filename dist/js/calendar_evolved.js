@@ -260,11 +260,11 @@ var _cal = (function (cal) {
                 var attr = this.parentNode;
 
                 /* If the unabledDay option is set  */
-                if(op.unabledDay || op.unabledWeek) {
-                    var un = e.target.parentNode.classList.value;
-                    if(un.indexOf('unable') > -1){
-                        return false
-                    }
+                
+                var un = e.target.parentNode.classList.value;
+                
+                if(un.indexOf('unable') > -1){
+                    return false
                 }
 
                 /* Get the currently clicked date properties and create a new object */
@@ -273,7 +273,7 @@ var _cal = (function (cal) {
                     month: self.transformDate.month,
                     day: parseInt(attr.getAttribute('date-day'))
                 }
-
+                
                 /* Format the selected date according to the determined options. */
                 var f = format(date_obj, op.format);
 
@@ -352,6 +352,7 @@ var _cal = (function (cal) {
         var startPoint = 0;
         var renderDay = 1;
         var prevRenderDay = sed.startday == 0 ?  sed.prevlastday - 7 : sed.prevlastday - sed.startday;
+        var nextRenderDay = 1;
         var title = "<span class='title-y'>"+yy+"</span> <span class='title-m'>"+mm+"</span>";
 
         o.full = $_td.year+'/'+$_td.month+'/'+$_td.day
@@ -411,14 +412,7 @@ var _cal = (function (cal) {
                 layout_complate.span[i][j].innerText = ''
                 layout_complate.col[i][j].classList.remove('special-day')
 
-                if(sed.startday == 0) {
-                    prevRenderDay++
-                    layout_complate.col[i][j].classList.add('unable')
-                    layout_complate.span[i][j].innerText = prevRenderDay;
-                    startPoint = 1;
-                }
-                
-                if(i == startPoint){
+                if(i == 0){
                     if(sed.startday <= j){
                         attr = true;
                         layout_complate.span[i][j].innerText = renderDay;
@@ -427,10 +421,16 @@ var _cal = (function (cal) {
                         layout_complate.col[i][j].classList.add('unable')
                         layout_complate.span[i][j].innerText = prevRenderDay;
                     }
-                }else if(i > startPoint){
+                }else if(i > 0){
                     if(sed.lastday >= renderDay){
                         layout_complate.span[i][j].innerText = renderDay;
-                    }else{  
+                    }else{
+                        // layout_complate.col[i][j].addEventListener('click', function () {
+                        //     self.methods.b.next(func);
+                        // })
+                        layout_complate.col[i][j].classList.add('unable')
+                        layout_complate.span[i][j].innerText = nextRenderDay;
+                        nextRenderDay++;
                         attr = false
                     }
                 }
@@ -466,6 +466,13 @@ var _cal = (function (cal) {
                     layout_complate.col[i][j].setAttribute('date-month', $_td.month)
                     layout_complate.col[i][j].setAttribute('date-day', renderDay)
                     renderDay++
+                }else{
+                    //removeAttribute
+                    if(layout_complate.col[i][j].attributes.length > 1){
+                        layout_complate.col[i][j].removeAttribute('date-year');
+                        layout_complate.col[i][j].removeAttribute('date-month');
+                        layout_complate.col[i][j].removeAttribute('date-day');
+                    }
                 }
 
                 // layout_complate.span[i][j].remove()
@@ -487,7 +494,7 @@ var _cal = (function (cal) {
 
         this.methods = {
             b : this.btn(),
-            setdate : this.setDate
+            setdate : this.setDate,
         }
 
         layout_complate.title[1].addEventListener('click', function () {
