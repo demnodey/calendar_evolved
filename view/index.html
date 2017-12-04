@@ -12,11 +12,13 @@
             padding:0;
         }
 
-        #main {
-            text-align: center;
-            margin-top:100px;
-            width: 100%;
+        #app {
+            width:350px;
+            margin: 0 auto;
+            padding:120px 25px;
+            border: 1px solid #000
         }
+        
     </style>
     <link rel='stylesheet' type='text/css' href='../dist/css/calendar_evolved.css'>
     <script type='text/javascript' src='../dist/js/calendar_evolved.js'></script>
@@ -29,14 +31,6 @@
 <script>
     _cal.setup({
         el: '#app',
-        specialDay : {
-            '12-04' : '0.1.7',
-            '12-05' : 'ver',
-            '12-06' : '업데이트'
-        },
-        clickActive: function (day) {
-            console.log(day);
-        }
     })
 
     console.log(_cal)

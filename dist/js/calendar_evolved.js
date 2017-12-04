@@ -8,7 +8,7 @@ var _cal = (function (cal) {
 
     function Calendar () {
         this.methods = {}
-        this.version = '0.1.7 version';
+        this.version = '0.1.7 +alpha version';
         this.prevSpecial = new Array();
     }
 
@@ -58,12 +58,18 @@ var _cal = (function (cal) {
         b.classList.add('calendar-body');
 
         l = d.createElement('div');
-        l.classList.add('calendar-btn-left');
         l.id = 'left-btn';
 
         r = d.createElement('div');
-        r.classList.add('calendar-btn-right');
         r.id = 'right-btn';
+
+        if(o.buttonCustomizer != undefined){
+            l.innerHTML = o.buttonCustomizer.left
+            r.innerHTML = o.buttonCustomizer.right
+        }else{
+            l.classList.add('calendar-btn-left');
+            r.classList.add('calendar-btn-right');
+        }
 
         c = d.createElement('div');
         c.classList.add('calendar');
@@ -425,9 +431,6 @@ var _cal = (function (cal) {
                     if(sed.lastday >= renderDay){
                         layout_complate.span[i][j].innerText = renderDay;
                     }else{
-                        // layout_complate.col[i][j].addEventListener('click', function () {
-                        //     self.methods.b.next(func);
-                        // })
                         layout_complate.col[i][j].classList.add('unable')
                         layout_complate.span[i][j].innerText = nextRenderDay;
                         nextRenderDay++;
@@ -474,8 +477,6 @@ var _cal = (function (cal) {
                         layout_complate.col[i][j].removeAttribute('date-day');
                     }
                 }
-
-                // layout_complate.span[i][j].remove()
             }
         }
         /** render end */

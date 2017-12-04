@@ -35,12 +35,11 @@
 
 .calendar-body .calendar-title #left-btn {
     width:15%;
-    height: 50px;
     float:left;
     cursor:pointer;
 }
 
-.calendar-body .calendar-title div.calendar-btn-left {
+.calendar-body .calendar-title .calendar-btn-left {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAATklEQVR4Ae3NsRFAYBQE4e0KhZmRGK9kKkCgAMkF75/9Lr9FkhorKnt/v6vg/bcte38yee+99/lAx8Q1SGIeIrHwg4kVkomdoOJAktp4AKp2d2Pqh9YJAAAAAElFTkSuQmCC');
     background-repeat: no-repeat;
 }
@@ -57,18 +56,13 @@
 
 .calendar-body .calendar-title #right-btn {
     width:15%;
-    height: 50px;
     float:right;
     cursor:pointer;
 }
 
-.calendar-body .calendar-title div.calendar-btn-right { 
-    width:15%;
-    height: 50px;
-    float:right;
+.calendar-body .calendar-title .calendar-btn-right { 
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAAUUlEQVR4Ae3Nuw2AQBDE0GmLT2NIBMuVDAUM4WVkg7SSXwG2AKCRS6WgIcu5xSnLycWimwULFn8v1uwgnN+a55/G+Z38lyOVn2rmc4tSWwDwAg8dd8M/SQZ2AAAAAElFTkSuQmCC');
     background-repeat: no-repeat;
-    cursor:pointer;
 }
 
 .calendar-body .calendar-head {
