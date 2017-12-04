@@ -262,15 +262,18 @@ var _cal = (function (cal) {
         }
         
         function clickActive (binder, op) {
+
             binder.addEventListener('click', function (e) {
                 var attr = this.parentNode;
+                var clist = e.target.parentNode.classList;
 
                 /* If the unabledDay option is set  */
-                
-                var un = e.target.parentNode.classList.value;
-                
-                if(un.indexOf('unable') > -1){
-                    return false
+                var un = clist.value == undefined ? mergeValue(clist) : clist.value;
+
+                if (un) {
+                    if(un.indexOf('unable') > -1){
+                        return false
+                    }
                 }
 
                 /* Get the currently clicked date properties and create a new object */
@@ -317,13 +320,22 @@ var _cal = (function (cal) {
         }
 
         function hasClass (param) {
-            var classValue = param.classList.value;
+            var classValue = param.classList.value == undefined ? mergeValue(param.classList) : param.classList.value;
 
             if (classValue) {
                 if (classValue.indexOf('special-day') > -1) {
                     self.prevSpecial.push(param)
                 }
             }
+        }
+
+        /* for IE ... */
+        function mergeValue (list) {
+            var value = '';
+            for(var i = 0; i < list.length; i++){
+                value += list[i]+' '
+            }
+            return value;
         }
 
         var special = specialFilter(this);
@@ -377,7 +389,12 @@ var _cal = (function (cal) {
 
         /* Remove old tag from prevSpecial */
         self.prevSpecial.forEach(function (el) {
-            el.childNodes[1].remove();
+            /* IE is not include Element remove */
+            if (el.childNodes[1]['remove'] == undefined) {
+                console.dir('IE is "what the hell???"');
+            } else {
+                el.childNodes[1].remove()
+            }
         })
 
         /* reset prevSpecial Object */
