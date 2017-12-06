@@ -185,3 +185,57 @@
 .calendar-body:hover .tooltip {
     opacity: 1
 }
+
+
+.calendar-body .drag-body {
+    background: #2196f3;
+    background-size: 90%
+}
+
+.calendar-body #context {
+    position:absolute;
+    top:0px;
+    left:0px;
+    background:#616161;
+    width:75px;
+    border-radius: 8px;
+    box-shadow: 3px 3px 5px 1px #555;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.calendar-body #context div {
+    background:#fff;
+    position: relative;
+    left:0px;
+    font-size:13px;
+    text-align:left;
+    padding:10px 7px;
+    transition: all .2s;
+    border-radius: 0 0 8px 8px;
+    border:2px solid #ccc;
+}
+
+.calendar-body #context div:active {
+    left:10px;
+}
+
+.calendar-body #context div:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.calendar-body #context div::after {
+    content: '';
+    background: #ca2020;
+    top: calc(100% - 21px);
+    left: calc(100% - 18px);
+    width:8px;
+    height:8px;
+    border-radius: 50%;
+    position: absolute;
+    transition: all .2s;
+}
+
+.calendar-body #context div:active::after {
+    background: #02b402;
+}

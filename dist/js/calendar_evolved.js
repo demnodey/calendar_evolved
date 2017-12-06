@@ -4,7 +4,7 @@
 
 var _cal = (function (cal) {
 
-    var layout_complate;
+    var layout;
 
     function Calendar () {
         this.methods = {}
@@ -47,7 +47,7 @@ var _cal = (function (cal) {
         /* mouse event option */
         b.ondragstart = function () {return false}
         b.onselectstart = function () {return false}
-        // body.oncontextmenu = function () {return false}
+        b.oncontextmenu = function () {return false}
 
         /* version alert */
         tooltip = d.createElement('span')
@@ -114,6 +114,21 @@ var _cal = (function (cal) {
             }
         }
 
+        // context menu
+        var context = d.createElement('div');
+        context.id = 'context';
+        var menuName = [{name:'day-start', text:'시작'}, {name:'day-end', text:'끝'}]
+        var menu = [];
+
+        for (var m = 0 ; m < menuName.length ; m++) {
+            menu.push(d.createElement('div'));
+            menu[m].innerText = menuName[m].text
+            menu[m].id = menuName[m].name
+            context.appendChild(menu[m])
+        }
+
+        b.appendChild(context);
+
         return {
             body: b,
             head: h,
@@ -121,7 +136,8 @@ var _cal = (function (cal) {
             row: row,
             col: col,
             span: span,
-            title : [c, l, r]
+            title : [c, l, r],
+            context : {ct: context , btn: menu}
         }
     }
 
@@ -261,7 +277,7 @@ var _cal = (function (cal) {
             }
         }
         
-        function clickActive (binder, op) {
+        function clickActive (binder, o) {
 
             binder.addEventListener('click', function (e) {
                 var attr = this.parentNode;
@@ -284,7 +300,7 @@ var _cal = (function (cal) {
                 }
                 
                 /* Format the selected date according to the determined options. */
-                var f = format(date_obj, op.format);
+                var f = format(date_obj, o.format);
 
                 var day = document.getElementsByClassName('active')
                 if(day.length != 0){
@@ -293,9 +309,9 @@ var _cal = (function (cal) {
                 binder.parentNode.classList.add('active')
         
                 /* If the clickActive option is set  */
-                if(op.clickActive != undefined){
-                    if(typeof op.clickActive === 'function'){
-                        op.clickActive(f);
+                if(o.clickActive != undefined){
+                    if(typeof o.clickActive === 'function'){
+                        o.clickActive(f);
                     }else{
                         onError('The clickActives type must be a "function".')
                     }
@@ -304,19 +320,63 @@ var _cal = (function (cal) {
             })
         }
 
-        function specialFilter (op) {
+        function specialFilter (o) {
             var sObj = {};
 
-            if(op.specialDay != undefined){
-                for(var i in op.specialDay){
+            if(o.specialDay != undefined){
+                for(var i in o.specialDay){
                     var day = i.split('-')
                     if(sObj[day[0]] == undefined){
                         sObj[day[0]] = [];
                     }
-                    sObj[day[0]].push({day: day[1], name: op.specialDay[i]})
+                    sObj[day[0]].push({day: day[1], name: o.specialDay[i]})
                 }
             }
             return sObj;
+        }
+
+        function tagFilter (_e) {
+            var _target = _e.target
+            var _tag = _e.target.tagName;
+            var newTarget = '';
+        
+            if(_tag === 'DIV'){
+                newTarget = _target
+            } else if (_tag === 'SPAN') {
+                newTarget = _target.parentNode
+            }
+            return newTarget;
+        }
+
+        function muntipleDay (o,l) {
+            var start = false, end = false;
+
+            l.body.addEventListener('contextmenu', function (e) {
+                var cm = tagFilter(e);
+
+                var classValue = cm.classList.value == undefined ? mergeValue(cm.classList) : cm.classList.value;
+                if(classValue) {
+                    if(classValue.indexOf('calendar-day') > -1) {
+                        l.context.ct.style.top = (cm.offsetTop + 36) + 'px';
+                        l.context.ct.style.left = (cm.offsetLeft + 20) + 'px';
+                        l.context.ct.style.opacity = 1;
+                    }
+                }
+            })
+
+            l.context.btn[0].addEventListener('click', function (e) {
+                l.context.ct.style.opacity = 0;
+                start = true;
+            })
+
+            l.context.btn[1].addEventListener('click', function (e) {
+                if (start == false) {
+                    alert('시작점을 선택해주세요.')
+                    return false;
+                }
+                l.context.ct.style.opacity = 0;
+                start = false;
+            })
         }
 
         function hasClass (param) {
@@ -328,6 +388,7 @@ var _cal = (function (cal) {
                 }
             }
         }
+        
 
         /* for IE ... */
         function mergeValue (list) {
@@ -342,6 +403,7 @@ var _cal = (function (cal) {
         var el = element(this);
         var action = clickActive;
         var data = setLoopLimit
+        var drag = muntipleDay;
 
         return {
             el: el,
@@ -349,7 +411,8 @@ var _cal = (function (cal) {
             data: data,
             action: action,
             special : special,
-            hasClass : hasClass
+            hasClass : hasClass,
+            multiSelecter : drag
         }
     }
 
@@ -375,9 +438,9 @@ var _cal = (function (cal) {
 
         o.full = $_td.year+'/'+$_td.month+'/'+$_td.day
         
-        layout_complate.body.setAttribute('full-day', o.full)
+        layout.body.setAttribute('full-day', o.full)
     
-        layout_complate.title[0].innerHTML = title
+        layout.title[0].innerHTML = title
 
         for(var _fs in func.special){
             if(_fs === mm){
@@ -400,20 +463,20 @@ var _cal = (function (cal) {
         /* reset prevSpecial Object */
         self.prevSpecial = []
 
-        for(var i = 0; i < layout_complate.row.length; i++){
-            for(var j = 0; j < layout_complate.span[0].length; j++){
+        for(var i = 0; i < layout.row.length; i++){
+            for(var j = 0; j < layout.span[0].length; j++){
 
                 /* before day unable option */
                 if (o.unabledDay == true) {
                     if ($_td.year <= $_nd.year && ($_td.month <= $_nd.month && $_nd.month <= 12)) {  
                         if(renderDay >= $_nd.day && $_td.month == $_nd.month && $_td.year >= $_nd.year){
-                            layout_complate.col[i][j].classList.remove('unable')
+                            layout.col[i][j].classList.remove('unable')
                         }else{
-                            layout_complate.col[i][j].classList.add('unable') 
+                            layout.col[i][j].classList.add('unable') 
                         }
                     }else{
                         if($_td.year >= $_nd.year || ($_td.month <= $_nd.month && $_nd.month <= 12)) {
-                            layout_complate.col[i][j].classList.remove('unable') 
+                            layout.col[i][j].classList.remove('unable') 
                         }
                     }
                 }
@@ -426,30 +489,30 @@ var _cal = (function (cal) {
                             return false;
                         }
                         if(el == j){
-                            layout_complate.col[i][j].classList.add('unable')
+                            layout.col[i][j].classList.add('unable')
                         }
                     })
                 }
 
                 /* reset render */
-                layout_complate.span[i][j].innerText = ''
-                layout_complate.col[i][j].classList.remove('special-day')
+                layout.span[i][j].innerText = ''
+                layout.col[i][j].classList.remove('special-day')
 
                 if(i == 0){
                     if(sed.startday <= j){
                         attr = true;
-                        layout_complate.span[i][j].innerText = renderDay;
+                        layout.span[i][j].innerText = renderDay;
                     } else {
                         prevRenderDay++
-                        layout_complate.col[i][j].classList.add('unable')
-                        layout_complate.span[i][j].innerText = prevRenderDay;
+                        layout.col[i][j].classList.add('unable')
+                        layout.span[i][j].innerText = prevRenderDay;
                     }
                 }else if(i > 0){
                     if(sed.lastday >= renderDay){
-                        layout_complate.span[i][j].innerText = renderDay;
+                        layout.span[i][j].innerText = renderDay;
                     }else{
-                        layout_complate.col[i][j].classList.add('unable')
-                        layout_complate.span[i][j].innerText = nextRenderDay;
+                        layout.col[i][j].classList.add('unable')
+                        layout.span[i][j].innerText = nextRenderDay;
                         nextRenderDay++;
                         attr = false
                     }
@@ -457,9 +520,9 @@ var _cal = (function (cal) {
 
                 /* today position option */
                 if(renderDay === $_nd.day && $_td.month == $_nd.month && $_td.year == $_nd.year && attr == true){
-                    layout_complate.col[i][j].classList.add('active', 'today')
+                    layout.col[i][j].classList.add('active', 'today')
                 }else{
-                    layout_complate.col[i][j].classList.remove('active', 'today')
+                    layout.col[i][j].classList.remove('active', 'today')
                 }
 
                 /* special-day render */
@@ -471,27 +534,27 @@ var _cal = (function (cal) {
                             var span = document.createElement('div');
                             span.classList.add('special-name');
                             span.innerText = specialDay[s].name
-                            layout_complate.col[i][j].classList.add('special-day')
-                            layout_complate.col[i][j].appendChild(span)
+                            layout.col[i][j].classList.add('special-day')
+                            layout.col[i][j].appendChild(span)
                         }
                     }
                 }
 
                 /* Put tag information installed in prevSpecial */   
-                func.hasClass(layout_complate.col[i][j]) 
+                func.hasClass(layout.col[i][j]) 
                 
                 if (attr == true) {  
-                    layout_complate.col[i][j].classList.remove('unable')
-                    layout_complate.col[i][j].setAttribute('date-year', $_td.year)
-                    layout_complate.col[i][j].setAttribute('date-month', $_td.month)
-                    layout_complate.col[i][j].setAttribute('date-day', renderDay)
+                    layout.col[i][j].classList.remove('unable')
+                    layout.col[i][j].setAttribute('date-year', $_td.year)
+                    layout.col[i][j].setAttribute('date-month', $_td.month)
+                    layout.col[i][j].setAttribute('date-day', renderDay)
                     renderDay++
                 }else{
                     //removeAttribute
-                    if(layout_complate.col[i][j].attributes.length > 1){
-                        layout_complate.col[i][j].removeAttribute('date-year');
-                        layout_complate.col[i][j].removeAttribute('date-month');
-                        layout_complate.col[i][j].removeAttribute('date-day');
+                    if(layout.col[i][j].attributes.length > 1){
+                        layout.col[i][j].removeAttribute('date-year');
+                        layout.col[i][j].removeAttribute('date-month');
+                        layout.col[i][j].removeAttribute('date-day');
                     }
                 }
             }
@@ -508,18 +571,20 @@ var _cal = (function (cal) {
         propLuncher(option)
         
         var func = this.fn();
-        layout_complate = layout(func,option,this);
+        layout = layout(func,option,this);
+
+        func.multiSelecter(self,layout);
 
         this.methods = {
             b : this.btn(),
             setdate : this.setDate,
         }
 
-        layout_complate.title[1].addEventListener('click', function () {
+        layout.title[1].addEventListener('click', function () {
             self.methods.b.prev(func);
         })
 
-        layout_complate.title[2].addEventListener('click', function () {
+        layout.title[2].addEventListener('click', function () {
             self.methods.b.next(func);
         })
 
