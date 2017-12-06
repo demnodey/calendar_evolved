@@ -350,6 +350,7 @@ var _cal = (function (cal) {
 
         function muntipleDay (o,l) {
             var start = false, end = false;
+            var checker, startNumber, endNumber;
 
             l.body.addEventListener('contextmenu', function (e) {
                 var cm = tagFilter(e);
@@ -360,12 +361,15 @@ var _cal = (function (cal) {
                         l.context.ct.style.top = (cm.offsetTop + 36) + 'px';
                         l.context.ct.style.left = (cm.offsetLeft + 20) + 'px';
                         l.context.ct.style.opacity = 1;
+                        checker = cm
                     }
                 }
             })
 
             l.context.btn[0].addEventListener('click', function (e) {
                 l.context.ct.style.opacity = 0;
+                checker.classList.add('drag-head');
+                startNumber = checker.getAttribute('date-day');
                 start = true;
             })
 
@@ -373,9 +377,17 @@ var _cal = (function (cal) {
                 if (start == false) {
                     alert('시작점을 선택해주세요.')
                     return false;
+                }else{
+                    checker.classList.add('drag-tail');
+                    endNumber = checker.getAttribute('date-day');
+                    
+                    for(var i = startNumber; i <= endNumber; i++){
+                        console.log(i)
+                    }
+
+                    l.context.ct.style.opacity = 0;
+                    start = false;
                 }
-                l.context.ct.style.opacity = 0;
-                start = false;
             })
         }
 

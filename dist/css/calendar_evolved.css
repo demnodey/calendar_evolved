@@ -186,6 +186,15 @@
     opacity: 1
 }
 
+.calendar-body .drag-head {
+    background: #2196f3;
+    background-size: 90%
+}
+
+.calendar-body .drag-tail {
+    background: #2196f3;
+    background-size: 90%
+}
 
 .calendar-body .drag-body {
     background: #2196f3;
