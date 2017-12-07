@@ -12,6 +12,7 @@
     letter-spacing: -1px;
     text-align: center;
     background: #fff;
+    z-index:2
 }
 
 .calendar-body .calendar-title {
@@ -117,6 +118,21 @@
     color:#ffffff
 }
 
+.calendar-body .active span.twinkle::after {
+    content:'';
+    position:absolute;
+    background: rgba(255, 255, 255, 1);
+    width:100%;
+    height:100%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0);
+    top:0;
+    left:0;
+    z-index:11;
+    animation: ripple .8s ease-out
+}
+
 .calendar-body .special-day span::after {
     content: '';
     background:#c20606;
@@ -187,17 +203,46 @@
 }
 
 .calendar-body .drag-head {
-    background: #2196f3;
-    background-size: 90%
+    position: relative;
+    z-index:10
+}
+
+.calendar-body .drag-head span::after {
+    content:'';
+    position:absolute;
+    background: rgb(255, 214, 110);
+    width:100%;
+    height:100%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0);
+    top:0;
+    left:0;
+    z-index:11;
+    animation: ripple .5s ease-out infinite
 }
 
 .calendar-body .drag-tail {
-    background: #2196f3;
     background-size: 90%
 }
 
+.calendar-body .drag-tail span::after {
+    content:'';
+    position:absolute;
+    background: rgb(255, 174, 0);
+    width:100%;
+    height:100%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0);
+    top:0;
+    left:0;
+    z-index:11;
+    animation: ripple .5s ease-out infinite
+}
+
 .calendar-body .drag-body {
-    background: #2196f3;
+    background: #21ddcd;
     background-size: 90%
 }
 
@@ -209,8 +254,13 @@
     width:75px;
     border-radius: 8px;
     box-shadow: 3px 3px 5px 1px #555;
-    opacity: 0;
-    transition: opacity 1s;
+    display:none;
+    z-index:1;
+}
+
+.calendar-body #context.show {
+    display: block;
+    z-index:9;
 }
 
 .calendar-body #context div {
@@ -247,4 +297,11 @@
 
 .calendar-body #context div:active::after {
     background: #02b402;
+}
+
+@keyframes ripple {
+    to{
+        transform: scale(1.5);
+        opacity: 0;
+    }
 }

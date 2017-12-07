@@ -8,7 +8,7 @@ var _cal = (function (cal) {
 
     function Calendar () {
         this.methods = {}
-        this.version = '0.1.7 +alpha version';
+        this.version = '0.1.8 beta version';
         this.prevSpecial = new Array();
     }
 
@@ -307,6 +307,10 @@ var _cal = (function (cal) {
                     day[0].classList.remove('active')
                 }
                 binder.parentNode.classList.add('active')
+
+                if (o.effectTwinkle != undefined && binder.parentNode.classList.value.indexOf('special-day') < 0) {
+                    binder.classList.add('twinkle')
+                }
         
                 /* If the clickActive option is set  */
                 if(o.clickActive != undefined){
@@ -340,17 +344,20 @@ var _cal = (function (cal) {
             var _tag = _e.target.tagName;
             var newTarget = '';
         
-            if(_tag === 'DIV'){
+            if(_tag.toLowerCase() === 'div'){
                 newTarget = _target
-            } else if (_tag === 'SPAN') {
+            } else if (_tag.toLowerCase() === 'span') {
                 newTarget = _target.parentNode
             }
             return newTarget;
         }
 
         function muntipleDay (o,l) {
-            var start = false, end = false;
-            var checker, startNumber, endNumber;
+            var start, checker, startNumber, endNumber;
+            var history = {
+                start : undefined,
+                end: undefined
+            };
 
             l.body.addEventListener('contextmenu', function (e) {
                 var cm = tagFilter(e);
@@ -360,32 +367,50 @@ var _cal = (function (cal) {
                     if(classValue.indexOf('calendar-day') > -1) {
                         l.context.ct.style.top = (cm.offsetTop + 36) + 'px';
                         l.context.ct.style.left = (cm.offsetLeft + 20) + 'px';
-                        l.context.ct.style.opacity = 1;
+                        l.context.ct.classList.add('show')
                         checker = cm
                     }
                 }
             })
 
             l.context.btn[0].addEventListener('click', function (e) {
-                l.context.ct.style.opacity = 0;
+                l.context.ct.classList.remove('show')
+
+                if(history.start != undefined){
+                    history.start.classList.remove('drag-head');
+                    if(history.end != undefined) {
+                        history.end.classList.remove('drag-tail');
+                    }
+                }
                 checker.classList.add('drag-head');
                 startNumber = checker.getAttribute('date-day');
+                history.start = checker;
                 start = true;
             })
 
             l.context.btn[1].addEventListener('click', function (e) {
-                if (start == false) {
+                if (history.start == undefined) {
                     alert('시작점을 선택해주세요.')
                     return false;
                 }else{
-                    checker.classList.add('drag-tail');
                     endNumber = checker.getAttribute('date-day');
-                    
+
+                    if (parseInt(endNumber) < parseInt(startNumber)) {
+                        alert('끝점이 시작점보다 작을 수 없습니다.')
+                        return false;
+                    }
+
+                    if(history.end != undefined){
+                        history.end.classList.remove('drag-tail');
+                    }
+                    checker.classList.add('drag-tail');
+                    history.end = checker;
+
                     for(var i = startNumber; i <= endNumber; i++){
                         console.log(i)
                     }
 
-                    l.context.ct.style.opacity = 0;
+                    l.context.ct.classList.remove('show')
                     start = false;
                 }
             })
