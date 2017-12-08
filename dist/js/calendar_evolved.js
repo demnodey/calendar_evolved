@@ -28,7 +28,7 @@ var _cal = (function (cal) {
     }
 
     var layout = function (f,o,self) {
-        var b, h, t, c, l, r, tooltip, d = document;
+        var b, h, t, c, l, r, cxt, tooltip, d = document;
         var row = [], col = [] , span = [], heads = [];
         var weekendSimple = ['Sun', 'Mon', 'The', 'Wen', 'Thu', 'Fri', 'Set'];
 
@@ -47,7 +47,7 @@ var _cal = (function (cal) {
         /* mouse event option */
         b.ondragstart = function () {return false}
         b.onselectstart = function () {return false}
-        b.oncontextmenu = function () {return false}
+        // b.oncontextmenu = function () {return false}
 
         /* version alert */
         tooltip = d.createElement('span')
@@ -94,6 +94,23 @@ var _cal = (function (cal) {
             h.appendChild(heads[w]) 
         }
 
+        // context menu
+        var context = d.createElement('div');
+        context.id = 'context';
+        var menuName = [{name:'multi-start', text:'시작'}, {name:'multi-end', text:'끝'}]
+        var menu = [];
+
+        // , {name:'multi-end', text:'끝'} , {name:'multi-close', text:'X'}
+        for (var m = 0 ; m < menuName.length ; m++) {
+            menu.push(d.createElement('button'));
+            menu[m].innerText = menuName[m].text
+            menu[m].id = menuName[m].name
+        }
+
+        context.appendChild(menu[0])
+
+        cxt = {ct : context , btn : menu}
+
         // dom 생성
         for (var i = 0; i < 6; i++) {
             col[i] = [];
@@ -110,24 +127,9 @@ var _cal = (function (cal) {
                 span[i].push(d.createElement('span'));
                 col[i][j].appendChild(span[i][j])
                 
-                f.action(span[i][j],o);   
+                f.action(span[i][j],o,cxt);   
             }
         }
-
-        // context menu
-        var context = d.createElement('div');
-        context.id = 'context';
-        var menuName = [{name:'day-start', text:'시작'}, {name:'day-end', text:'끝'}]
-        var menu = [];
-
-        for (var m = 0 ; m < menuName.length ; m++) {
-            menu.push(d.createElement('div'));
-            menu[m].innerText = menuName[m].text
-            menu[m].id = menuName[m].name
-            context.appendChild(menu[m])
-        }
-
-        b.appendChild(context);
 
         return {
             body: b,
@@ -137,7 +139,6 @@ var _cal = (function (cal) {
             col: col,
             span: span,
             title : [c, l, r],
-            context : {ct: context , btn: menu}
         }
     }
 
@@ -277,8 +278,7 @@ var _cal = (function (cal) {
             }
         }
         
-        function clickActive (binder, o) {
-
+        function clickActive (binder, o, ctx) {
             binder.addEventListener('click', function (e) {
                 var attr = this.parentNode;
                 var clist = e.target.parentNode.classList;
@@ -308,17 +308,18 @@ var _cal = (function (cal) {
                 }
                 binder.parentNode.classList.add('active')
 
-                if (o.effectTwinkle != undefined && binder.parentNode.classList.value.indexOf('special-day') < 0) {
-                    binder.classList.add('twinkle')
-                }
-        
                 /* If the clickActive option is set  */
-                if(o.clickActive != undefined){
+                if (o.clickActive != undefined) {
                     if(typeof o.clickActive === 'function'){
                         o.clickActive(f);
                     }else{
                         onError('The clickActives type must be a "function".')
                     }
+                }
+
+                if (o.multipleDay != undefined) {
+                    binder.parentNode.appendChild(ctx.ct);
+                    ctx.ct.classList.add('show')
                 }
                  
             })
@@ -352,68 +353,8 @@ var _cal = (function (cal) {
             return newTarget;
         }
 
-        function muntipleDay (o,l) {
-            var start, checker, startNumber, endNumber;
-            var history = {
-                start : undefined,
-                end: undefined
-            };
-
-            l.body.addEventListener('contextmenu', function (e) {
-                var cm = tagFilter(e);
-
-                var classValue = cm.classList.value == undefined ? mergeValue(cm.classList) : cm.classList.value;
-                if(classValue) {
-                    if(classValue.indexOf('calendar-day') > -1) {
-                        l.context.ct.style.top = (cm.offsetTop + 36) + 'px';
-                        l.context.ct.style.left = (cm.offsetLeft + 20) + 'px';
-                        l.context.ct.classList.add('show')
-                        checker = cm
-                    }
-                }
-            })
-
-            l.context.btn[0].addEventListener('click', function (e) {
-                l.context.ct.classList.remove('show')
-
-                if(history.start != undefined){
-                    history.start.classList.remove('drag-head');
-                    if(history.end != undefined) {
-                        history.end.classList.remove('drag-tail');
-                    }
-                }
-                checker.classList.add('drag-head');
-                startNumber = checker.getAttribute('date-day');
-                history.start = checker;
-                start = true;
-            })
-
-            l.context.btn[1].addEventListener('click', function (e) {
-                if (history.start == undefined) {
-                    alert('시작점을 선택해주세요.')
-                    return false;
-                }else{
-                    endNumber = checker.getAttribute('date-day');
-
-                    if (parseInt(endNumber) < parseInt(startNumber)) {
-                        alert('끝점이 시작점보다 작을 수 없습니다.')
-                        return false;
-                    }
-
-                    if(history.end != undefined){
-                        history.end.classList.remove('drag-tail');
-                    }
-                    checker.classList.add('drag-tail');
-                    history.end = checker;
-
-                    for(var i = startNumber; i <= endNumber; i++){
-                        console.log(i)
-                    }
-
-                    l.context.ct.classList.remove('show')
-                    start = false;
-                }
-            })
+        function multipleDay (o,l) {
+            
         }
 
         function hasClass (param) {
@@ -426,7 +367,6 @@ var _cal = (function (cal) {
             }
         }
         
-
         /* for IE ... */
         function mergeValue (list) {
             var value = '';
@@ -440,7 +380,7 @@ var _cal = (function (cal) {
         var el = element(this);
         var action = clickActive;
         var data = setLoopLimit
-        var drag = muntipleDay;
+        
 
         return {
             el: el,
@@ -449,7 +389,6 @@ var _cal = (function (cal) {
             action: action,
             special : special,
             hasClass : hasClass,
-            multiSelecter : drag
         }
     }
 
@@ -609,8 +548,6 @@ var _cal = (function (cal) {
         
         var func = this.fn();
         layout = layout(func,option,this);
-
-        func.multiSelecter(self,layout);
 
         this.methods = {
             b : this.btn(),

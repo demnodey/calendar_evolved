@@ -13,10 +13,9 @@
         }
 
         #app {
-            width:350px;
-            margin: 0 auto;
+
             padding:120px 25px;
-            border: 1px solid #000
+           
         }
     </style>
     <link rel='stylesheet' type='text/css' href='../dist/css/calendar_evolved.css'>
@@ -31,11 +30,18 @@
     _cal.setup({
         el: '#app',
         specialDay : {
-            '12-08' : '0.1.8',
-            '12-09' : 'ver',
-            '12-10' : '업데이트'
+            '12-09' : '0.1.8',
+            '12-10' : 'ver',
+            '12-11' : '업데이트'
         },
-        effectTwinkle: true
+        clickActive: function (d) {
+            console.log(d);
+        },
+        multipleDay: function (list , start , end) {
+            console.log(list)
+            console.log(start)
+            console.log(end)
+        }
     })
 
     // console.log(_cal)
