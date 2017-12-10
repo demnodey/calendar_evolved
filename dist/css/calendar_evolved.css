@@ -118,7 +118,7 @@
     color:#ffffff
 }
 
-.calendar-body .active span::after {
+.calendar-body .active:not(.special-day) span::after {
     content:'';
     position:absolute;
     background: rgba(255, 255, 255, .7);
@@ -130,7 +130,7 @@
     top:0;
     left:0;
     z-index:11;
-    animation: ripple .8s ease-out
+    animation: ripple_clicker .8s ease-out
 }
 
 .calendar-body .special-day span::after {
@@ -201,43 +201,38 @@
     opacity: 1
 }
 
-.calendar-body .drag-head {
-    position: relative;
-    z-index:10
-}
 
-.calendar-body .twinkle.drag-head::after {
+
+.calendar-body .drag-head::after {
     content:'';
     position:absolute;
     background: rgb(43, 74, 255);
-    width:100%;
-    height:100%;
+    width:20px;
+    height:20px;
     border-radius: 50%;
     pointer-events: none;
     transform: scale(0);
     top:0;
-    left:0;
-    z-index:11;
-    animation: ripple .5s ease-out infinite
+    right:0;
+    z-index:1;
+    animation: ripple .8s ease-out infinite
 }
 
-.calendar-body .drag-tail {
-    background-size: 90%
-}
 
-.calendar-body .twinkle.drag-tail::after {
+
+.calendar-body .drag-tail::after {
     content:'';
     position:absolute;
     background: rgb(255, 85, 18);
-    width:100%;
-    height:100%;
+    width:20px;
+    height:20px;
     border-radius: 50%;
     pointer-events: none;
     transform: scale(0);
     top:0;
-    left:0;
-    z-index:11;
-    animation: ripple .5s ease-out infinite
+    right:0;
+    z-index:1;
+    animation: ripple .8s ease-out infinite
 }
 
 .calendar-body .drag-body {
@@ -250,7 +245,7 @@
     display:none;
     top: 47px; 
     left: calc(50% - 17px);
-    z-index:1;
+    z-index:2;
 }
 
 .calendar-body #context.show {
@@ -266,14 +261,33 @@
     height:21px;
     font-size:11px;
     text-align:center;
-    transition: all .2s;
     /* border-radius: 50%; */
     border:1px solid black
 }
 
-@keyframes ripple {
+.calendar-body #multi-end {
+    background:#fff;
+    position: absolute;
+    top:20px;
+    padding:0;
+    width:34px;
+    height:21px;
+    font-size:11px;
+    text-align:center;
+    /* border-radius: 50%; */
+    border:1px solid black
+}
+
+@keyframes ripple_clicker {
     to{
         transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes ripple {
+    to{
+        transform: scale(1);
         opacity: 0;
     }
 }

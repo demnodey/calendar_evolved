@@ -13,9 +13,7 @@
         }
 
         #app {
-
-            padding:120px 25px;
-           
+            padding:120px 0px;
         }
     </style>
     <link rel='stylesheet' type='text/css' href='../dist/css/calendar_evolved.css'>
@@ -27,21 +25,9 @@
     </div>
 </body>
 <script>
+
     _cal.setup({
         el: '#app',
-        specialDay : {
-            '12-09' : '0.1.8',
-            '12-10' : 'ver',
-            '12-11' : '업데이트'
-        },
-        clickActive: function (d) {
-            console.log(d);
-        },
-        multipleDay: function (list , start , end) {
-            console.log(list)
-            console.log(start)
-            console.log(end)
-        }
     })
 
     // console.log(_cal)

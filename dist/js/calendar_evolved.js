@@ -26,11 +26,50 @@ var _cal = (function (cal) {
             }
         }
     }
+    
+    var _tag = function (el) {
+        
+        function parents (division , find) {
+            var t = el.parentNode;
+            var value;
+            
+            while(true){
+                if (division === 'class') {
+                    value = classMerge(t.classList)
+                }else if (division === 'id') {
+                    value = t.id
+                } else {
+                    value = t.tagName
+                }
+                
+                if(value.indexOf(find) > -1){
+                    break;
+                }
+                t = t.parentNode;
+            }
+
+            return t;
+        }
+
+        function classMerge (list) {
+            var value = '';
+            for(var i = 0; i < list.length; i++){
+                value += list[i]+' '
+            }
+            return value;
+        }
+
+
+        return {
+            parents : parents
+        }
+    }
 
     var layout = function (f,o,self) {
-        var b, h, t, c, l, r, cxt, tooltip, d = document;
+        var b, h, t, c, l, r, tooltip, d = document;
         var row = [], col = [] , span = [], heads = [];
         var weekendSimple = ['Sun', 'Mon', 'The', 'Wen', 'Thu', 'Fri', 'Set'];
+        var multi = {head : undefined , tail : undefined};
 
         /* week simple name option */
         if(o.weekendSimple != undefined) {
@@ -94,23 +133,6 @@ var _cal = (function (cal) {
             h.appendChild(heads[w]) 
         }
 
-        // context menu
-        var context = d.createElement('div');
-        context.id = 'context';
-        var menuName = [{name:'multi-start', text:'시작'}, {name:'multi-end', text:'끝'}]
-        var menu = [];
-
-        // , {name:'multi-end', text:'끝'} , {name:'multi-close', text:'X'}
-        for (var m = 0 ; m < menuName.length ; m++) {
-            menu.push(d.createElement('button'));
-            menu[m].innerText = menuName[m].text
-            menu[m].id = menuName[m].name
-        }
-
-        context.appendChild(menu[0])
-
-        cxt = {ct : context , btn : menu}
-
         // dom 생성
         for (var i = 0; i < 6; i++) {
             col[i] = [];
@@ -127,8 +149,62 @@ var _cal = (function (cal) {
                 span[i].push(d.createElement('span'));
                 col[i][j].appendChild(span[i][j])
                 
-                f.action(span[i][j],o,cxt);   
+                f.action(span[i][j],o);   
             }
+        }
+
+        // context menu
+        if(o.multipleDay != undefined){
+
+            var context = d.createElement('div');
+            context.id = 'context';
+            var menuName = [{name:'multi-start', text:'시작'}, {name:'multi-end', text:'끝'}]
+            var menu = [];
+
+            for (var m = 0 ; m < menuName.length ; m++) {
+                menu.push(d.createElement('button'));
+                menu[m].innerText = menuName[m].text
+                menu[m].id = menuName[m].name
+            }
+
+            menu[0].addEventListener('click', function (e) {
+                var target = _tag(e.target).parents('class','calendar-day');
+                if(multi.head != undefined){
+                    multi.head.attr.classList.remove('drag-head')
+                }
+
+                multi.head = {attr : target , day : parseInt(target.getAttribute('date-day'))};
+                target.classList.add('drag-head')
+                
+                context.appendChild(menu[1])
+                context.classList.remove('show')
+            })
+
+            menu[1].addEventListener('click', function (e) {
+                var retener = [];
+                var target = _tag(e.target).parents('class','calendar-day');
+                if(multi.head.day > parseInt(target.getAttribute('date-day'))){
+                    return false;
+                }
+
+                if(multi.tail != undefined){
+                    multi.tail.attr.classList.remove('drag-tail')
+                }
+
+                multi.tail = {attr : target , day : parseInt(target.getAttribute('date-day'))};
+                target.classList.add('drag-tail')
+
+                for(var  i = multi.head.day; i <= multi.tail.day; i++){
+                    retener.push(i)
+                }
+
+                o.multipleDay(retener, multi.head.day, multi.tail.day)
+                context.classList.remove('show')
+            })
+
+            context.appendChild(menu[0])
+
+            f.multipleDay(span , context)
         }
 
         return {
@@ -139,6 +215,7 @@ var _cal = (function (cal) {
             col: col,
             span: span,
             title : [c, l, r],
+            ctx: {ct : context , btn : menu}
         }
     }
 
@@ -206,10 +283,12 @@ var _cal = (function (cal) {
     // 내부 함수 기능
     Calendar.prototype.fn = function () {
         var self = this;
+        var binded = {start : undefined, end: undefined}
 
         function element(o) {
             var el, reg = /^[#|.]\w+$/;
-            if(typeof o != Object){
+            
+            if(typeof o == 'object'){
                 if (!reg.test(o.el)) {
                     onError('You write wrong Selector \n Include id or class css selector in "el" option.')
                     if(!o.el){
@@ -219,7 +298,7 @@ var _cal = (function (cal) {
                     el = document.querySelector(o.el);
                     return el;
                 } 
-            } 
+            }
         }
 
         function format (date , form) {
@@ -278,7 +357,7 @@ var _cal = (function (cal) {
             }
         }
         
-        function clickActive (binder, o, ctx) {
+        function clickActive (binder, o) {
             binder.addEventListener('click', function (e) {
                 var attr = this.parentNode;
                 var clist = e.target.parentNode.classList;
@@ -316,12 +395,6 @@ var _cal = (function (cal) {
                         onError('The clickActives type must be a "function".')
                     }
                 }
-
-                if (o.multipleDay != undefined) {
-                    binder.parentNode.appendChild(ctx.ct);
-                    ctx.ct.classList.add('show')
-                }
-                 
             })
         }
 
@@ -353,13 +426,19 @@ var _cal = (function (cal) {
             return newTarget;
         }
 
-        function multipleDay (o,l) {
-            
+        function multipleDay (span , ctx) {
+            span.forEach(function (stairone) {
+                stairone.forEach(function (stairtwo) {
+                    stairtwo.addEventListener('click', function (e) {
+                        stairtwo.parentNode.appendChild(ctx)
+                        ctx.classList.add('show')
+                    })
+                })
+            })
         }
 
         function hasClass (param) {
             var classValue = param.classList.value == undefined ? mergeValue(param.classList) : param.classList.value;
-
             if (classValue) {
                 if (classValue.indexOf('special-day') > -1) {
                     self.prevSpecial.push(param)
@@ -381,7 +460,6 @@ var _cal = (function (cal) {
         var action = clickActive;
         var data = setLoopLimit
         
-
         return {
             el: el,
             format: format,
@@ -389,6 +467,7 @@ var _cal = (function (cal) {
             action: action,
             special : special,
             hasClass : hasClass,
+            multipleDay : multipleDay
         }
     }
 
@@ -473,6 +552,8 @@ var _cal = (function (cal) {
                 /* reset render */
                 layout.span[i][j].innerText = ''
                 layout.col[i][j].classList.remove('special-day')
+                layout.col[i][j].classList.remove('drag-head')
+                layout.col[i][j].classList.remove('drag-tail')
 
                 if(i == 0){
                     if(sed.startday <= j){
