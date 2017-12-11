@@ -4,7 +4,7 @@
 
 var _cal = (function (cal) {
 
-    var layout, multiMemory = {pick0: [], pick1: []};
+    var layout;
 
     function Calendar () {
         this.methods = {}
@@ -78,7 +78,7 @@ var _cal = (function (cal) {
         var b, h, t, c, l, r, tooltip, d = document;
         var row = [], col = [] , span = [], heads = [];
         var weekendSimple = ['Sun', 'Mon', 'The', 'Wen', 'Thu', 'Fri', 'Set'];
-        var multiple = [], clickCount = 0 ;
+        var multi = {head : undefined , tail : undefined};
 
         /* week simple name option */
         if(o.weekendSimple != undefined) {
@@ -164,46 +164,55 @@ var _cal = (function (cal) {
 
         // context menu
         if(o.multipleDay != undefined){
+
             var context = d.createElement('div');
             context.id = 'context';
-            var menu = d.createElement('button');
-            menu.innerText = '선택';
-            menu.id = 'multi-button'
+            var menuName = [{name:'multi-start', text:'시작'}, {name:'multi-end', text:'끝'}]
+            var menu = [];
 
-            menu.addEventListener('click', function (e) {
+            for (var m = 0 ; m < menuName.length ; m++) {
+                menu.push(d.createElement('button'));
+                menu[m].innerText = menuName[m].text
+                menu[m].id = menuName[m].name
+            }
+
+            menu[0].addEventListener('click', function (e) {
                 var target = _tag(e.target).parents('class','calendar-day');
-               if (clickCount == 2) {
-                    multiple.forEach(function (el) {
-                        el.classList.remove('multi-choice')
-                    })
-                    clickCount = 0;
+                if(multi.head != undefined){
+                    multi.head.attr.classList.remove('drag-head')
                 }
 
-                target.classList.add('multi-choice')
-                multiple[clickCount] = target;
-                multiMemory['pick'+clickCount] = [target.getAttribute('date-year'),target.getAttribute('date-month'),target.getAttribute('date-day')]
+                multi.head = {attr : target , day : parseInt(target.getAttribute('date-day'))};
+                target.classList.add('drag-head')
                 
-                if (clickCount == 1) {
-                    var temp,alterater = false;
-
-                    for(var i = 0; i < multiMemory.pick0.length; i++){
-                        alterater = parseInt(multiMemory.pick0[i]) > parseInt(multiMemory.pick1[i]) ? true : false
-                        if(alterater == true){
-                            temp = multiMemory.pick0;
-                            multiMemory.pick0 = multiMemory.pick1;
-                            multiMemory.pick1 = temp;
-                            break;
-                        }
-                    }
-
-
-
-                    o.multipleDay(multiMemory.pick0,multiMemory.pick1)
-                }
-                clickCount++;
+                context.appendChild(menu[1])
+                context.classList.remove('show')
             })
-            
-            context.appendChild(menu)
+
+            menu[1].addEventListener('click', function (e) {
+                var retener = [];
+                var target = _tag(e.target).parents('class','calendar-day');
+                if(multi.head.day > parseInt(target.getAttribute('date-day'))){
+                    return false;
+                }
+
+                if(multi.tail != undefined){
+                    multi.tail.attr.classList.remove('drag-tail')
+                }
+
+                multi.tail = {attr : target , day : parseInt(target.getAttribute('date-day'))};
+                target.classList.add('drag-tail')
+
+                for(var  i = multi.head.day; i <= multi.tail.day; i++){
+                    retener.push(i)
+                }
+
+                o.multipleDay(retener, multi.head.day, multi.tail.day)
+                context.classList.remove('show')
+            })
+
+            context.appendChild(menu[0])
+
             f.multipleDay(span , context)
         }
 
@@ -215,6 +224,7 @@ var _cal = (function (cal) {
             col: col,
             span: span,
             title : [c, l, r],
+            ctx: {ct : context , btn : menu}
         }
     }
 
@@ -337,6 +347,7 @@ var _cal = (function (cal) {
                     these.ny = props.year + 1;
                     these.nm =  1
                 }
+
                 return 32 - new Date(these.ny, these.nm - 1, 32).getDate();
             }
 
@@ -424,7 +435,7 @@ var _cal = (function (cal) {
             return newTarget;
         }
 
-        function multipleDay (span, ctx) {
+        function multipleDay (span , ctx) {
             span.forEach(function (stairone) {
                 stairone.forEach(function (stairtwo) {
                     stairtwo.addEventListener('click', function (e) {
@@ -495,6 +506,8 @@ var _cal = (function (cal) {
         layout.body.setAttribute('full-day', o.full)
 
         /* */
+        layout.ctx.ct.classList.remove('show')
+    
         layout.title[0].innerHTML = title
 
         for(var _fs in func.special){
@@ -552,7 +565,8 @@ var _cal = (function (cal) {
                 /* reset render */
                 layout.span[i][j].innerText = ''
                 layout.col[i][j].classList.remove('special-day')
-                layout.col[i][j].classList.remove('multi-choice')
+                layout.col[i][j].classList.remove('drag-head')
+                layout.col[i][j].classList.remove('drag-tail')
 
                 if(i == 0){
                     if(sed.startday <= j){

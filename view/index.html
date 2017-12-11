@@ -28,6 +28,18 @@
 
     _cal.setup({
         el: '#app',
+        format: 'yyyy년 mm월 dd일',
+        clickActive: function (d) {
+            console.log(d)
+        },
+        unabledDay: true,
+        unabledWeek: [6],
+        weekendSimple: ['일','월','화','수','목','금','토'],
+        multipleDay: function (start, end) {
+            console.log(start)
+            console.log(end)
+        }
+        
     })
 
     // console.log(_cal)
