@@ -196,8 +196,6 @@ var _cal = (function (cal) {
                         }
                     }
 
-
-
                     o.multipleDay(multiMemory.pick0,multiMemory.pick1)
                 }
                 clickCount++;
