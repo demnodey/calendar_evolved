@@ -8,7 +8,7 @@ var _cal = (function (cal) {
 
     function Calendar () {
         this.methods = {};
-        this.version = '0.1.8 beta version';
+        this.version = '0.1.8';
         this.prevSpecial = new Array();
     }
 
@@ -202,8 +202,6 @@ var _cal = (function (cal) {
                             break;
                         }
                     }
-
-
 
                     o.multipleDay(multiMemory.pick0,multiMemory.pick1);
                 }
