@@ -7,7 +7,7 @@ var _cal = (function (cal) {
     var layout, multiMemory = {pick0: [], pick1: []};
 
     function Calendar () {
-        this.methods = {}
+        this.methods = {};
         this.version = '0.1.8 beta version';
         this.prevSpecial = new Array();
     }
@@ -20,16 +20,16 @@ var _cal = (function (cal) {
                 if(_cal[i] == undefined){
                     _cal[i] = _para[i];
                 } else {
-                    onError('"'+_cal[i]+'" is aleady exist in props value')
+                    onError('"'+_cal[i]+'" is aleady exist in props value');
                     break;
                 }
             }
         }
-    }
+    };
     
     var _tag = function (el) {
 
-        var name = ['year', 'month' , 'day']
+        var name = ['year', 'month' , 'day'];
         
         function parents (division , find) {
             var t = el.parentNode;
@@ -37,11 +37,11 @@ var _cal = (function (cal) {
             
             while(true){
                 if (division === 'class') {
-                    value = classMerge(t.classList)
+                    value = classMerge(t.classList);
                 }else if (division === 'id') {
-                    value = t.id
+                    value = t.id;
                 } else {
-                    value = t.tagName
+                    value = t.tagName;
                 }
                 
                 if(value.indexOf(find) > -1){
@@ -61,18 +61,25 @@ var _cal = (function (cal) {
             return value;
         }
 
-        function setOnceAttr (el, obj) {
+        function addOnceAttribute (el, obj) {
             obj.forEach(function (value, index) {
                 el.setAttribute("date-"+name[index], value);
             })
         }
 
+        function removeOnceAttribute (el) {
+            name.forEach(function (value) {
+                el.removeAttribute("date-"+value);
+            })
+        }
+
 
         return {
-            parents : parents,
-            setOnceAttr : setOnceAttr
+            parents: parents,
+            addOnceAttribute: addOnceAttribute,
+            removeOnceAttribute: removeOnceAttribute
         }
-    }
+    };
 
     var layout = function (f,o,self) {
         var b, h, t, c, l, r, tooltip, d = document;
@@ -83,7 +90,7 @@ var _cal = (function (cal) {
         /* week simple name option */
         if(o.weekendSimple != undefined) {
             if(o.weekendSimple.length < 7){
-                onError('Lack a number in weekendSimple to index length.')
+                onError('Lack a number in weekendSimple to index length.');
             }else{
                 weekendSimple = o.weekendSimple;
             }
@@ -93,15 +100,15 @@ var _cal = (function (cal) {
         b = f.el.appendChild(d.createElement('div'));
 
         /* mouse event option */
-        b.ondragstart = function () {return false}
-        b.onselectstart = function () {return false}
+        b.ondragstart = function () {return false};
+        b.onselectstart = function () {return false};
         // b.oncontextmenu = function () {return false}
 
         /* version alert */
-        tooltip = d.createElement('span')
+        tooltip = d.createElement('span');
         tooltip.classList.add('tooltip');
         tooltip.innerText = self.version;
-        b.appendChild(tooltip)
+        b.appendChild(tooltip);
     
         b.classList.add('calendar-body');
 
@@ -112,8 +119,8 @@ var _cal = (function (cal) {
         r.id = 'right-btn';
 
         if(o.buttonCustomizer != undefined){
-            l.innerHTML = o.buttonCustomizer.left
-            r.innerHTML = o.buttonCustomizer.right
+            l.innerHTML = o.buttonCustomizer.left;
+            r.innerHTML = o.buttonCustomizer.right;
         }else{
             l.classList.add('calendar-btn-left');
             r.classList.add('calendar-btn-right');
@@ -125,21 +132,21 @@ var _cal = (function (cal) {
         t = d.createElement('div');
         t.classList.add('calendar-title');
 
-        t.appendChild(l)
-        t.appendChild(c)
-        t.appendChild(r)
+        t.appendChild(l);
+        t.appendChild(c);
+        t.appendChild(r);
 
-        b.appendChild(t)
+        b.appendChild(t);
 
         h = d.createElement('div');
         h.classList.add('calendar-head');
-        b.appendChild(h)
+        b.appendChild(h);
 
         for (var w = 0; w < 7; w++){
             heads.push(d.createElement('div'));
             heads[w].classList.add('calendar-week');
             heads[w].innerText = weekendSimple[w];
-            h.appendChild(heads[w]) 
+            h.appendChild(heads[w]);
         }
 
         // dom 생성
@@ -147,47 +154,47 @@ var _cal = (function (cal) {
             col[i] = [];
             span[i] = [];
 
-            row.push(d.createElement('div'))
+            row.push(d.createElement('div'));
             b.appendChild(row[i]);
-            row[i].classList.add('calendar-row')
+            row[i].classList.add('calendar-row');
             for (var j = 0; j < 7; j++) {
                 col[i].push(d.createElement('div'));
-                row[i].appendChild(col[i][j])
-                col[i][j].classList.add('calendar-day')
+                row[i].appendChild(col[i][j]);
+                col[i][j].classList.add('calendar-day');
         
                 span[i].push(d.createElement('span'));
-                col[i][j].appendChild(span[i][j])
+                col[i][j].appendChild(span[i][j]);
                 
                 f.action(span[i][j],o);   
             }
         }
 
         // context menu
-        if(o.multipleDay != undefined){
+        if (o.multipleDay != undefined) {
             var context = d.createElement('div');
             context.id = 'context';
             var menu = d.createElement('button');
             menu.innerText = '선택';
-            menu.id = 'multi-button'
+            menu.id = 'multi-button';
 
             menu.addEventListener('click', function (e) {
                 var target = _tag(e.target).parents('class','calendar-day');
                if (clickCount == 2) {
                     multiple.forEach(function (el) {
-                        el.classList.remove('multi-choice')
-                    })
+                        el.classList.remove('multi-choice');
+                    });
                     clickCount = 0;
                 }
 
-                target.classList.add('multi-choice')
+                target.classList.add('multi-choice');
                 multiple[clickCount] = target;
-                multiMemory['pick'+clickCount] = [target.getAttribute('date-year'),target.getAttribute('date-month'),target.getAttribute('date-day')]
+                multiMemory['pick'+clickCount] = [target.getAttribute('date-year'),target.getAttribute('date-month'),target.getAttribute('date-day')];
                 
                 if (clickCount == 1) {
                     var temp,alterater = false;
 
                     for(var i = 0; i < multiMemory.pick0.length; i++){
-                        alterater = parseInt(multiMemory.pick0[i]) > parseInt(multiMemory.pick1[i]) ? true : false
+                        alterater = parseInt(multiMemory.pick0[i]) > parseInt(multiMemory.pick1[i]) ? true : false;
                         if(alterater == true){
                             temp = multiMemory.pick0;
                             multiMemory.pick0 = multiMemory.pick1;
@@ -198,14 +205,14 @@ var _cal = (function (cal) {
 
 
 
-                    o.multipleDay(multiMemory.pick0,multiMemory.pick1)
+                    o.multipleDay(multiMemory.pick0,multiMemory.pick1);
                 }
                 clickCount++;
-            })
+            });
             
-            context.appendChild(menu)
-            f.multipleDay(span , context)
-        }
+            context.appendChild(menu);
+            f.multipleDay(span , context);
+        };
 
         return {
             body: b,
@@ -216,12 +223,12 @@ var _cal = (function (cal) {
             span: span,
             title : [c, l, r],
         }
-    }
+    };
 
     // Error
     var onError = function (err){
-        console.error(new Error(err))
-    }
+        console.error(new Error(err));
+    };
 
     Calendar.prototype.setDate = function (set) {
         var _set = set == undefined ? Date.now() : set;
@@ -234,76 +241,76 @@ var _cal = (function (cal) {
             month: d.getMonth() + 1,
             day: d.getDate(),
             week: d.getDay(),
-        }
+        };
 
         this.transformDate = {
             year: _d.getFullYear(),
             month: _d.getMonth() + 1,
             day: _d.getDate(),
             week: _d.getDay()
-        }
-    }
+        };
+    };
 
     Calendar.prototype.btn = function (s) {
         var self = this;
         var _selec = s;
 
         var next = function (func) {
-            var y = self.transformDate.year
-            var m = self.transformDate.month + 1
+            var y = self.transformDate.year;
+            var m = self.transformDate.month + 1;
             if(m > 12) {
                 m = 1;
-                y++
+                y++;
             }
 
             self.setDate(y +'/'+ m +'/'+ 1);
-            self.fn(self).data()
-            self.render(self, func)
-        }
+            self.fn(self).data();
+            self.render(self, func);
+        };
 
         var prev = function (func) {
-            var y = self.transformDate.year
-            var m = self.transformDate.month - 1
+            var y = self.transformDate.year;
+            var m = self.transformDate.month - 1;
             if(m < 1) {
                 m = 12;
-                y--
+                y--;
             }
             self.setDate(y +'/'+ m +'/'+ 1);
-            self.fn(self).data()
-            self.render(self, func)
-        }
+            self.fn(self).data();
+            self.render(self, func);
+        };
 
         return {
             next: next,
             prev: prev
         }
-    }
+    };
 
     // 내부 함수 기능
     Calendar.prototype.fn = function () {
         var self = this;
-        var binded = {start : undefined, end: undefined}
+        var binded = {start : undefined, end: undefined};
 
         function element(o) {
             var el, reg = /^[#|.]\w+$/;
             
-            if(typeof o == 'object'){
+            if (typeof o == 'object') {
                 if (!reg.test(o.el)) {
-                    onError('You write wrong Selector \n Include id or class css selector in "el" option.')
-                    if(!o.el){
-                        onError('You didn`t write Selector in option Object.')
+                    onError('You write wrong Selector \n Include id or class css selector in "el" option.');
+                    if (!o.el ){
+                        onError('You didn`t write Selector in option Object.');
                     }
                 } else {
                     el = document.querySelector(o.el);
                     return el;
                 } 
             }
-        }
+        };
 
         function format (date , form) {
             var perfect_date; 
             perfect_date = date.year+"/"+date.month+"/"+date.day;
-            if(form != undefined){
+            if (form != undefined) {
                 perfect_date = form.replace(/(yyyy|yy|mm|m|dd|d)/gi , function (n) {
                     switch(n){
                         case 'yyyy' : return date.year;
@@ -317,7 +324,7 @@ var _cal = (function (cal) {
                 });
             }
             return perfect_date;
-        }
+        };
 
         function setLoopLimit (prev, next) {
             var props = self.transformDate;
@@ -329,7 +336,7 @@ var _cal = (function (cal) {
                     these.pm =  12
                 }
                 return 32 - new Date(these.py, these.pm - 1, 32).getDate();
-            }
+            };
 
             var nextProps = function () {
                 var these = {ny : props.year, nm : props.month + 1};
@@ -338,7 +345,7 @@ var _cal = (function (cal) {
                     these.nm =  1
                 }
                 return 32 - new Date(these.ny, these.nm - 1, 32).getDate();
-            }
+            };
 
             var lastday = 32 - new Date(props.year, props.month -1, 32).getDate();
             var startday = new Date(props.year, props.month -1, 1).getDay();
@@ -353,7 +360,7 @@ var _cal = (function (cal) {
                 lastday: lastday,
                 startday: startday
             }
-        }
+        };
         
         function clickActive (binder, o) {
             binder.addEventListener('click', function (e) {
@@ -374,89 +381,89 @@ var _cal = (function (cal) {
                     year: self.transformDate.year,
                     month: self.transformDate.month,
                     day: parseInt(attr.getAttribute('date-day'))
-                }
+                };
                 
                 /* Format the selected date according to the determined options. */
                 var f = format(date_obj, o.format);
 
-                var day = document.getElementsByClassName('active')
+                var day = document.getElementsByClassName('active');
                 if(day.length != 0){
-                    day[0].classList.remove('active')
+                    day[0].classList.remove('active');
                 }
-                binder.parentNode.classList.add('active')
+                binder.parentNode.classList.add('active');
 
                 /* If the clickActive option is set  */
                 if (o.clickActive != undefined) {
                     if(typeof o.clickActive === 'function'){
                         o.clickActive(f);
                     }else{
-                        onError('The clickActives type must be a "function".')
+                        onError('The clickActives type must be a "function".');
                     }
                 }
             })
-        }
+        };
 
         function specialFilter (o) {
             var sObj = {};
 
             if(o.specialDay != undefined){
                 for(var i in o.specialDay){
-                    var day = i.split('-')
+                    var day = i.split('-');
                     if(sObj[day[0]] == undefined){
                         sObj[day[0]] = [];
                     }
-                    sObj[day[0]].push({day: day[1], name: o.specialDay[i]})
+                    sObj[day[0]].push({day: day[1], name: o.specialDay[i]});
                 }
             }
             return sObj;
-        }
+        };
 
         function tagFilter (_e) {
-            var _target = _e.target
+            var _target = _e.target;
             var _tag = _e.target.tagName;
             var newTarget = '';
         
             if(_tag.toLowerCase() === 'div'){
-                newTarget = _target
+                newTarget = _target;
             } else if (_tag.toLowerCase() === 'span') {
-                newTarget = _target.parentNode
+                newTarget = _target.parentNode;
             }
             return newTarget;
-        }
+        };
 
         function multipleDay (span, ctx) {
             span.forEach(function (stairone) {
                 stairone.forEach(function (stairtwo) {
                     stairtwo.addEventListener('click', function (e) {
-                        stairtwo.parentNode.appendChild(ctx)
-                        ctx.classList.add('show')
+                        stairtwo.parentNode.appendChild(ctx);
+                        ctx.classList.add('show');
                     })
                 })
             })
-        }
+        };
 
         function hasClass (param) {
             var classValue = param.classList.value == undefined ? mergeValue(param.classList) : param.classList.value;
             if (classValue) {
                 if (classValue.indexOf('special-day') > -1) {
-                    self.prevSpecial.push(param)
+                    self.prevSpecial.push(param);
                 }
             }
-        }
+        };
         
         /* for IE ... */
         function mergeValue (list) {
             var value = '';
             for(var i = 0; i < list.length; i++){
-                value += list[i]+' '
+                value += list[i]+' ';
             }
             return value;
-        }
+        };
 
         var special = specialFilter(this);
         var el = element(this);
         var action = clickActive;
-        var data = setLoopLimit
+        var data = setLoopLimit;
         
         return {
             el: el,
@@ -467,7 +474,7 @@ var _cal = (function (cal) {
             hasClass : hasClass,
             multipleDay : multipleDay
         }
-    }
+    };
 
     // client 렌더링
     Calendar.prototype.render = function (option,func) {
@@ -483,19 +490,18 @@ var _cal = (function (cal) {
 
         var attr = false;
         var includeMonth = false;
-        var specialDay = []
+        var specialDay = [];
         var startPoint = 0;
         var renderDay = 1;
         var prevRenderDay = sed.startday == 0 ?  sed.prevlastday - 7 : sed.prevlastday - sed.startday;
         var nextRenderDay = 1;
         var title = "<span class='title-y'>"+yy+"</span> <span class='title-m'>"+mm+"</span>";
 
-        o.full = $_td.year+'/'+$_td.month+'/'+$_td.day
+        o.full = $_td.year+'/'+$_td.month+'/'+$_td.day;
         
-        layout.body.setAttribute('full-day', o.full)
+        layout.body.setAttribute('full-day', o.full);
 
-        /* */
-        layout.title[0].innerHTML = title
+        layout.title[0].innerHTML = title;
 
         for(var _fs in func.special){
             if(_fs === mm){
@@ -511,27 +517,27 @@ var _cal = (function (cal) {
             if (el.childNodes[1]['remove'] == undefined) {
                 console.dir('IE is "what the hell???"');
             } else {
-                el.childNodes[1].remove()
+                el.childNodes[1].remove();
             }
-        })
+        });
 
         /* reset prevSpecial Object */
-        self.prevSpecial = []
+        self.prevSpecial = [];
 
-        for(var i = 0; i < layout.row.length; i++){
-            for(var j = 0; j < layout.span[0].length; j++){
+        for (var i = 0; i < layout.row.length; i++) {
+            for (var j = 0; j < layout.span[0].length; j++) {
 
                 /* before day unable option */
                 if (o.unabledDay == true) {
                     if ($_td.year <= $_nd.year && ($_td.month <= $_nd.month && $_nd.month <= 12)) {  
                         if(renderDay >= $_nd.day && $_td.month == $_nd.month && $_td.year >= $_nd.year){
-                            layout.col[i][j].classList.remove('unable')
+                            layout.col[i][j].classList.remove('unable');
                         }else{
-                            layout.col[i][j].classList.add('unable') 
+                            layout.col[i][j].classList.add('unable');
                         }
                     }else{
                         if($_td.year >= $_nd.year || ($_td.month <= $_nd.month && $_nd.month <= 12)) {
-                            layout.col[i][j].classList.remove('unable') 
+                            layout.col[i][j].classList.remove('unable');
                         }
                     }
                 }
@@ -544,77 +550,74 @@ var _cal = (function (cal) {
                             return false;
                         }
                         if(el == j){
-                            layout.col[i][j].classList.add('unable')
+                            layout.col[i][j].classList.add('unable');
                         }
                     })
                 }
 
                 /* reset render */
-                layout.span[i][j].innerText = ''
-                layout.col[i][j].classList.remove('special-day')
-                layout.col[i][j].classList.remove('multi-choice')
+                layout.span[i][j].innerText = '';
+                layout.col[i][j].classList.remove('special-day');
+                layout.col[i][j].classList.remove('multi-choice');
 
-                if(i == 0){
-                    if(sed.startday <= j){
+                if (i == 0) {
+                    if (sed.startday <= j) {
                         attr = true;
                         layout.span[i][j].innerText = renderDay;
                     } else {
-                        prevRenderDay++
-                        layout.col[i][j].classList.add('unable')
+                        prevRenderDay++;
+                        layout.col[i][j].classList.add('unable');
                         layout.span[i][j].innerText = prevRenderDay;
                     }
-                }else if(i > 0){
-                    if(sed.lastday >= renderDay){
+                } else if (i > 0) {
+                    if (sed.lastday >= renderDay) {
                         layout.span[i][j].innerText = renderDay;
-                    }else{
-                        layout.col[i][j].classList.add('unable')
+                    } else {
+                        layout.col[i][j].classList.add('unable');
                         layout.span[i][j].innerText = nextRenderDay;
                         nextRenderDay++;
-                        attr = false
+                        attr = false;
                     }
                 }
 
                 /* today position option */
-                if(renderDay === $_nd.day && $_td.month == $_nd.month && $_td.year == $_nd.year && attr == true){
-                    layout.col[i][j].classList.add('active', 'today')
-                }else{
-                    layout.col[i][j].classList.remove('active', 'today')
+                if (renderDay === $_nd.day && $_td.month == $_nd.month && $_td.year == $_nd.year && attr == true) {
+                    layout.col[i][j].classList.add('active', 'today');
+                } else {
+                    layout.col[i][j].classList.remove('active', 'today');
                 }
 
                 /* special-day render */
                 if (specialDay.length != 0 && attr == true) {
-                    for(var s = 0; s < specialDay.length; s++){
+                    for (var s = 0; s < specialDay.length; s++) {
                         var span = document.createElement('div');
                         span.classList.add('special-name');
                         if (parseInt(specialDay[s].day) == renderDay) {
                             var span = document.createElement('div');
                             span.classList.add('special-name');
-                            span.innerText = specialDay[s].name
-                            layout.col[i][j].classList.add('special-day')
-                            layout.col[i][j].appendChild(span)
+                            span.innerText = specialDay[s].name;
+                            layout.col[i][j].classList.add('special-day');
+                            layout.col[i][j].appendChild(span);
                         }
                     }
                 }
 
                 /* Put tag information installed in prevSpecial */   
-                func.hasClass(layout.col[i][j]) 
+                func.hasClass(layout.col[i][j]);
                 
                 if (attr == true) {  
-                    // layout.col[i][j].classList.remove('unable')
-                    t.setOnceAttr(layout.col[i][j],[$_td.year, $_td.month, renderDay])
-                    renderDay++
-                }else{
-                    //removeAttribute
-                    if(layout.col[i][j].attributes.length > 1){
-                        layout.col[i][j].removeAttribute('date-year');
-                        layout.col[i][j].removeAttribute('date-month');
-                        layout.col[i][j].removeAttribute('date-day');
+                    layout.col[i][j].classList.remove('unable');
+                    t.addOnceAttribute(layout.col[i][j],[$_td.year, $_td.month, renderDay]);
+                    renderDay++;
+                } else {
+                    if (layout.col[i][j].attributes.length > 1) {
+                        t.removeOnceAttribute(layout.col[i][j]);
                     }
                 }
             }
         }
         /** render end */
-    }
+    };
 
     // setup Calandar
     Calendar.prototype.setup = function (option) {
@@ -622,7 +625,7 @@ var _cal = (function (cal) {
         var self = this;
         this.setDate();
 
-        propLuncher(option)
+        propLuncher(option);
         
         var func = this.fn();
         layout = layout(func,option,this);
@@ -630,22 +633,22 @@ var _cal = (function (cal) {
         this.methods = {
             b : this.btn(),
             setdate : this.setDate,
-        }
+        };
 
         layout.title[1].addEventListener('click', function () {
             self.methods.b.prev(func);
-        })
+        });
 
         layout.title[2].addEventListener('click', function () {
             self.methods.b.next(func);
-        })
+        });
 
-        this.render(option, func)   
-    }
+        this.render(option, func);  
+    };
 
     return new Calendar();
 }(this));
 
 if(!window._cal){
-    window.$c = window._cal = _cal
+    window.$c = window._cal = _cal;
 }
