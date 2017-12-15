@@ -7,7 +7,7 @@
     width:90%;
     margin:0 auto;
     font-size: 17px;
-    /* font-family: 'Nanum Gothic'; */
+    font-family: 'Nanum Gothic';
     /* font-family: Roboto,Noto,Helvetica,Arial,sans-serif; */
     letter-spacing: -1px;
     text-align: center;
@@ -34,6 +34,16 @@
     color: #000
 }
 
+.calendar-body .calendar-title div.calendar {
+    font-size:18px;
+    letter-spacing: 1.0px;
+    width: 70%;
+    height: 50px;
+    line-height: 43px;
+    text-align:center;
+    letter-spacing: -1.0px;
+}
+
 .calendar-body .calendar-title #left-btn {
     width:15%;
     float:left;
@@ -43,16 +53,6 @@
 .calendar-body .calendar-title .calendar-btn-left {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAATklEQVR4Ae3NsRFAYBQE4e0KhZmRGK9kKkCgAMkF75/9Lr9FkhorKnt/v6vg/bcte38yee+99/lAx8Q1SGIeIrHwg4kVkomdoOJAktp4AKp2d2Pqh9YJAAAAAElFTkSuQmCC');
     background-repeat: no-repeat;
-}
-
-.calendar-body .calendar-title div.calendar {
-    font-size:18px;
-    letter-spacing: 1.0px;
-    width: 70%;
-    height: 50px;
-    line-height: 43px;
-    text-align:center;
-    letter-spacing: -1.0px;
 }
 
 .calendar-body .calendar-title #right-btn {
@@ -147,12 +147,12 @@
 
 .calendar-body .special-day .special-name {
     position: absolute;
-    bottom:18px;
     width:100%;
+    top:21px;
     text-align: center;
     font-size:11px;
     height: 0px;
-    line-height: initial;
+    /* line-height: initial; */
     font-weight: bold;
     transition: all .5s
 }
@@ -164,7 +164,7 @@
 }
 
 .calendar-body .special-day.active .special-name {
-    bottom:36px;
+    top:2px;
 }
 
 .calendar-body span {

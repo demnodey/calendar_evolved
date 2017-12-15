@@ -512,11 +512,7 @@ var _cal = (function (cal) {
         /* Remove old tag from prevSpecial */
         self.prevSpecial.forEach(function (el) {
             /* IE is not include Element remove */
-            if (el.childNodes[1]['remove'] == undefined) {
-                console.dir('IE is "what the hell???"');
-            } else {
-                el.childNodes[1].remove();
-            }
+            el.removeChild(el.childNodes[1])
         });
 
         /* reset prevSpecial Object */

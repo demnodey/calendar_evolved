@@ -17,7 +17,7 @@
         }
     </style>
     <link rel='stylesheet' type='text/css' href='../dist/css/calendar_evolved.css'>
-    <script type='text/javascript' src='../dist/js/calendar_evolved.min.js'></script>
+    <script type='text/javascript' src='../dist/js/calendar_evolved.js'></script>
 </head>
 <body>
     <div id='main'>
@@ -26,7 +26,12 @@
 </body>
 <script>
     _cal.setup({
-        el: '#app'
+        el: '#app',
+        specialDay : {
+            '12-4':'ver',
+            '12-5':'IE',
+            '12-6':'EDIT'
+        }
     })
 </script>
 </html>
