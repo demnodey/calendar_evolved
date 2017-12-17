@@ -8,7 +8,7 @@ var _cal = (function (cal) {
 
     function Calendar () {
         this.methods = {};
-        this.version = '0.1.8';
+        this.version = '0.1.8 plus';
         this.prevSpecial = new Array();
     }
 
@@ -97,7 +97,7 @@ var _cal = (function (cal) {
         }
 
         /* div create */
-        b = f.el.appendChild(d.createElement('div'));
+        b = f.el(self).appendChild(d.createElement('div'));
 
         /* mouse event option */
         b.ondragstart = function () {return false};
@@ -226,6 +226,7 @@ var _cal = (function (cal) {
     // Error
     var onError = function (err){
         console.error(new Error(err));
+        return false;
     };
 
     Calendar.prototype.setDate = function (set) {
@@ -291,6 +292,7 @@ var _cal = (function (cal) {
 
         function element(o) {
             var el, reg = /^[#|.]\w+$/;
+            var input, tn, tag = false;
             
             if (typeof o == 'object') {
                 if (!reg.test(o.el)) {
@@ -299,8 +301,32 @@ var _cal = (function (cal) {
                         onError('You didn`t write Selector in option Object.');
                     }
                 } else {
+                    try {
+
                     el = document.querySelector(o.el);
-                    return el;
+                    tn = el.tagName.toLowerCase();
+                        
+                    if(tn === 'input' || tn === 'button'){
+                        tag = true;
+                        input = document.createElement('div');
+                        input.className = "calendar-input";
+                        document.querySelector('body').appendChild(input);
+
+                        el.addEventListener('focus', function (e) {
+                            var top = e.target.offsetTop + e.target.offsetHeight + 5 + 'px';
+                            var left = e.target.offsetLeft + 'px';
+                            
+                            input.style.opacity = 1;
+                            input.style.top = top;
+                            input.style.left = left;
+                        });
+                    }
+
+                    return tag == true ? input : el;
+
+                    } catch (err) {
+                        onError('It does not exist in the selected ID or class.');
+                    }
                 } 
             }
         };
@@ -361,7 +387,15 @@ var _cal = (function (cal) {
         };
         
         function clickActive (binder, o) {
+
+            var calendarInput = document.querySelector('.calendar-input');
+
             binder.addEventListener('click', function (e) {
+                
+                if (calendarInput != undefined) {
+                    calendarInput.style.opacity = '0'
+                }
+
                 var attr = this.parentNode;
                 var clist = e.target.parentNode.classList;
 
@@ -459,7 +493,7 @@ var _cal = (function (cal) {
         };
 
         var special = specialFilter(this);
-        var el = element(this);
+        var el = element;
         var action = clickActive;
         var data = setLoopLimit;
         
@@ -495,7 +529,7 @@ var _cal = (function (cal) {
         var nextRenderDay = 1;
         var title = "<span class='title-y'>"+yy+"</span> <span class='title-m'>"+mm+"</span>";
 
-        o.full = $_td.year+'/'+$_td.month+'/'+$_td.day;
+        o.full = $_td.year+'/'+$_td.month;
         
         layout.body.setAttribute('full-day', o.full);
 
