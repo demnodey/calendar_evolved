@@ -310,13 +310,25 @@ var _cal = (function (cal) {
                         tag = true;
                         input = document.createElement('div');
                         input.className = "calendar-input";
-                        document.querySelector('body').appendChild(input);
+                        var back = document.querySelector('body')
+                        back.appendChild(input);
+                    
+                        document.addEventListener('click', function (e) {
+                            console.log(mergeValue(input.classList).indexOf('fadeIn'))
+                            if (mergeValue(input.classList).indexOf('fadeIn') == 15) {
+                                if (mergeValue(e.target.classList).indexOf('calendar') != 0) {
+                                    input.classList.remove('fadeIn');
+                                }
+                            }
+                        })
+                       
+                        var event = tn === 'input' ? 'focus' : 'click';
 
-                        el.addEventListener('focus', function (e) {
+                        el.addEventListener(event, function (e) {
                             var top = e.target.offsetTop + e.target.offsetHeight + 5 + 'px';
                             var left = e.target.offsetLeft + 'px';
                             
-                            input.style.opacity = 1;
+                            input.classList.add('fadeIn')
                             input.style.top = top;
                             input.style.left = left;
                         });
@@ -393,7 +405,7 @@ var _cal = (function (cal) {
             binder.addEventListener('click', function (e) {
                 
                 if (calendarInput != undefined) {
-                    calendarInput.style.opacity = '0'
+                    calendarInput.classList.remove('fadeIn')
                 }
 
                 var attr = this.parentNode;
