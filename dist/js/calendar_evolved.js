@@ -323,7 +323,6 @@ var _cal = (function (cal) {
                     tag = tn === 'input' || tn === 'button' ? true : false;
 
                     if(tag){
-
                         input = document.createElement('div');
                         input.className = "calendar-input";
                         var back = document.querySelector('body');
@@ -592,6 +591,8 @@ var _cal = (function (cal) {
                 }
 
                 /* chois day of week unable option */
+
+                // layout.col[i][j].classList.remove('unable');
                 if (o.unabledWeek != undefined) { 
                     o.unabledWeek.forEach(function (el) {
                         if(el > 6){ 
@@ -652,8 +653,7 @@ var _cal = (function (cal) {
                 /* Put tag information installed in prevSpecial */   
                 func.hasClass(layout.col[i][j]);
                 
-                if (attr == true) {  
-                    layout.col[i][j].classList.remove('unable');
+                if (attr == true) {
                     t.addOnceAttribute(layout.col[i][j],[$_td.year, $_td.month, renderDay]);
                     renderDay++;
                 } else {
