@@ -6,17 +6,14 @@
 .calendar-input {
     position: absolute;
     padding: 15px 0;
-    opacity: 0;
-    display: none;
     width:250px;
-    transition: all .6s;
+    display: none;
     border:1px solid #ccc;
     z-index: 0;
 }
 
 .calendar-input.fadeIn {
     display: block;
-    opacity: 1;
     z-index: 999;
 }
 
@@ -62,6 +59,15 @@
     width: 25px;
     height: 25px;
     line-height: 25px;
+}
+
+.calendar-input .calendar-body .calendar-row .calendar-day .special-name {
+    font-size:0;
+}
+
+.calendar-input .calendar-body .special-day.active span::after {
+    background: #c20606;
+    transform: initial;
 }
 
 .calendar-body {
@@ -113,6 +119,7 @@
 }
 
 .calendar-body .calendar-title .calendar-btn-left {
+    background-position: 0 0;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAATklEQVR4Ae3NsRFAYBQE4e0KhZmRGK9kKkCgAMkF75/9Lr9FkhorKnt/v6vg/bcte38yee+99/lAx8Q1SGIeIrHwg4kVkomdoOJAktp4AKp2d2Pqh9YJAAAAAElFTkSuQmCC');
     background-repeat: no-repeat;
 }
@@ -124,6 +131,7 @@
 }
 
 .calendar-body .calendar-title .calendar-btn-right { 
+    background-position: 100% 0px;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAAUUlEQVR4Ae3Nuw2AQBDE0GmLT2NIBMuVDAUM4WVkg7SSXwG2AKCRS6WgIcu5xSnLycWimwULFn8v1uwgnN+a55/G+Z38lyOVn2rmc4tSWwDwAg8dd8M/SQZ2AAAAAElFTkSuQmCC');
     background-repeat: no-repeat;
 }
@@ -169,13 +177,17 @@
     font-size:15px;
 }
 
+.calendar-body .calendar-row .calendar-day span:hover {
+    /* border:1px solid #ccc */
+}
+
 .calendar-body .calendar-row .unable span{
     cursor: default;
     color:#c2c2c2
 }
 
 .calendar-body .today span {
-    background:#bdbdbd;;
+    background:#dedede;
     color:#8f8f8f;
 }
 

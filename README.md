@@ -25,4 +25,4 @@
 > * *titleComstom : 상단 날짜 부분 커스터마이징 하기 (미완성)*
 > * *modal : modal 기능 (미완성)*
 
-##### 태그인식 ( input , div )
+##### 태그인식 ( input , button )

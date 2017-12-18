@@ -7,7 +7,6 @@ var _cal = (function (cal) {
     var layout, multiMemory = {pick0: [], pick1: []};
 
     function Calendar () {
-        this.methods = {};
         this.version = '0.1.8 plus';
         this.prevSpecial = new Array();
     }
@@ -35,29 +34,44 @@ var _cal = (function (cal) {
             var t = el.parentNode;
             var value;
             
-            while(true){
-                if (division === 'class') {
-                    value = classMerge(t.classList);
-                }else if (division === 'id') {
-                    value = t.id;
-                } else {
-                    value = t.tagName;
-                }
-                
-                if(value.indexOf(find) > -1){
-                    break;
-                }
-                t = t.parentNode;
-            }
+            if (t.parentNode == null) {
+                return false;
+            } else {
+                while(true){
 
-            return t;
+                    if (t == null) {
+                        t = false;
+                        break;
+                    }
+                    
+                    if (division === 'class') {
+                        value = classMerge(t.classList);
+                    }else if (division === 'id') {
+                        value = t.id;
+                    } else {
+                        value = t.tagName;
+                    }
+                    
+                    if(value.indexOf(find) > -1){ 
+                        break; 
+                    }
+
+                    t = t.parentNode;
+                }
+                return t;
+            }
         }
 
+        /* for IE ... */
         function classMerge (l) {
             var value = '';
-            for(var i = 0; i < l.length; i++){
-                value += l[i]+' '
+            
+            if (l != undefined) {
+                for(var i = 0; i < l.length; i++){
+                    value += l[i]+' '
+                }
             }
+
             return value;
         }
 
@@ -75,6 +89,7 @@ var _cal = (function (cal) {
 
 
         return {
+            classMerge: classMerge,
             parents: parents,
             addOnceAttribute: addOnceAttribute,
             removeOnceAttribute: removeOnceAttribute
@@ -179,7 +194,7 @@ var _cal = (function (cal) {
 
             menu.addEventListener('click', function (e) {
                 var target = _tag(e.target).parents('class','calendar-day');
-               if (clickCount == 2) {
+                if (clickCount == 2) {
                     multiple.forEach(function (el) {
                         el.classList.remove('multi-choice');
                     });
@@ -292,7 +307,7 @@ var _cal = (function (cal) {
 
         function element(o) {
             var el, reg = /^[#|.]\w+$/;
-            var input, tn, tag = false;
+            var input, tn, tag = false, fadeTime = false;
             
             if (typeof o == 'object') {
                 if (!reg.test(o.el)) {
@@ -305,22 +320,24 @@ var _cal = (function (cal) {
 
                     el = document.querySelector(o.el);
                     tn = el.tagName.toLowerCase();
-                        
-                    if(tn === 'input' || tn === 'button'){
-                        tag = true;
+                    tag = tn === 'input' || tn === 'button' ? true : false;
+
+                    if(tag){
+
                         input = document.createElement('div');
                         input.className = "calendar-input";
-                        var back = document.querySelector('body')
+                        var back = document.querySelector('body');
                         back.appendChild(input);
                     
                         document.addEventListener('click', function (e) {
-                            console.log(mergeValue(input.classList).indexOf('fadeIn'))
-                            if (mergeValue(input.classList).indexOf('fadeIn') == 15) {
-                                if (mergeValue(e.target.classList).indexOf('calendar') != 0) {
-                                    input.classList.remove('fadeIn');
-                                }
+                            var findword = _tag(e.target).parents('class','calendar-input');
+                            var findclass = ( findword != false ) || ( _tag().classMerge(e.target.classList).indexOf('calendar') > -1 );
+                            
+                            if ( findclass == false && fadeTime == true && e.target.tagName.toLowerCase() != 'input') {
+                                input.classList.remove('fadeIn');
+                                fadeTime = false;
                             }
-                        })
+                        });
                        
                         var event = tn === 'input' ? 'focus' : 'click';
 
@@ -328,9 +345,13 @@ var _cal = (function (cal) {
                             var top = e.target.offsetTop + e.target.offsetHeight + 5 + 'px';
                             var left = e.target.offsetLeft + 'px';
                             
-                            input.classList.add('fadeIn')
+                            input.classList.add('fadeIn');
                             input.style.top = top;
                             input.style.left = left;
+
+                            setTimeout(function () {
+                                fadeTime = true;
+                            }, 200);
                         });
                     }
 
@@ -344,10 +365,10 @@ var _cal = (function (cal) {
         };
 
         function format (date , form) {
-            var perfect_date; 
-            perfect_date = date.year+"/"+date.month+"/"+date.day;
+            var _date; 
+            _date = date.year+"/"+date.month+"/"+date.day;
             if (form != undefined) {
-                perfect_date = form.replace(/(yyyy|yy|mm|m|dd|d)/gi , function (n) {
+                _date = form.replace(/(yyyy|yy|mm|m|dd|d)/gi , function (n) {
                     switch(n){
                         case 'yyyy' : return date.year;
                         case 'yy' : return (date.year % 1000);
@@ -359,7 +380,7 @@ var _cal = (function (cal) {
                     }
                 });
             }
-            return perfect_date;
+            return _date;
         };
 
         function setLoopLimit (prev, next) {
@@ -403,16 +424,12 @@ var _cal = (function (cal) {
             var calendarInput = document.querySelector('.calendar-input');
 
             binder.addEventListener('click', function (e) {
-                
-                if (calendarInput != undefined) {
-                    calendarInput.classList.remove('fadeIn')
-                }
-
+            
                 var attr = this.parentNode;
                 var clist = e.target.parentNode.classList;
 
                 /* If the unabledDay option is set  */
-                var un = clist.value == undefined ? mergeValue(clist) : clist.value;
+                var un = clist.value == undefined ? _tag().classMerge(clist) : clist.value;
 
                 if (un) {
                     if(un.indexOf('unable') > -1){
@@ -439,6 +456,7 @@ var _cal = (function (cal) {
                 /* If the clickActive option is set  */
                 if (o.clickActive != undefined) {
                     if(typeof o.clickActive === 'function'){
+                        // console.log(o.clickActive.length)
                         o.clickActive(f);
                     }else{
                         onError('The clickActives type must be a "function".');
@@ -464,12 +482,12 @@ var _cal = (function (cal) {
 
         function tagFilter (_e) {
             var _target = _e.target;
-            var _tag = _e.target.tagName;
+            var tag = _e.target.tagName;
             var newTarget = '';
         
-            if(_tag.toLowerCase() === 'div'){
+            if(tag.toLowerCase() === 'div'){
                 newTarget = _target;
-            } else if (_tag.toLowerCase() === 'span') {
+            } else if (tag.toLowerCase() === 'span') {
                 newTarget = _target.parentNode;
             }
             return newTarget;
@@ -487,21 +505,12 @@ var _cal = (function (cal) {
         };
 
         function hasClass (param) {
-            var classValue = param.classList.value == undefined ? mergeValue(param.classList) : param.classList.value;
+            var classValue = param.classList.value == undefined ? _tag().classMerge(param.classList) : param.classList.value;
             if (classValue) {
                 if (classValue.indexOf('special-day') > -1) {
                     self.prevSpecial.push(param);
                 }
             }
-        };
-        
-        /* for IE ... */
-        function mergeValue (list) {
-            var value = '';
-            for(var i = 0; i < list.length; i++){
-                value += list[i]+' ';
-            }
-            return value;
         };
 
         var special = specialFilter(this);
@@ -523,12 +532,12 @@ var _cal = (function (cal) {
     // client 렌더링
     Calendar.prototype.render = function (option,func) {
         
-        var t = new _tag();
+        var t = _tag();
         var self = this;
         var o = option;
         var $_nd = this.nowDate;
         var $_td = this.transformDate;
-        var yy = func.format($_td , 'yyyy');
+        var yyyy = func.format($_td , 'yyyy');
         var mm = func.format($_td , 'mm');
         var sed = func.data();  // start end data
 
@@ -539,7 +548,7 @@ var _cal = (function (cal) {
         var renderDay = 1;
         var prevRenderDay = sed.startday == 0 ?  sed.prevlastday - 7 : sed.prevlastday - sed.startday;
         var nextRenderDay = 1;
-        var title = "<span class='title-y'>"+yy+"</span> <span class='title-m'>"+mm+"</span>";
+        var title = "<span class='title-y'>"+yyyy+"</span> <span class='title-m'>"+mm+"</span>";
 
         o.full = $_td.year+'/'+$_td.month;
         
@@ -630,11 +639,9 @@ var _cal = (function (cal) {
                 /* special-day render */
                 if (specialDay.length != 0 && attr == true) {
                     for (var s = 0; s < specialDay.length; s++) {
-                        var span = document.createElement('div');
-                        span.classList.add('special-name');
                         if (parseInt(specialDay[s].day) == renderDay) {
                             var span = document.createElement('div');
-                            span.classList.add('special-name');
+                            span.className = 'special-name';
                             span.innerText = specialDay[s].name;
                             layout.col[i][j].classList.add('special-day');
                             layout.col[i][j].appendChild(span);
@@ -667,20 +674,16 @@ var _cal = (function (cal) {
 
         propLuncher(option);
         
+        var btn = this.btn();
         var func = this.fn();
         layout = layout(func,option,this);
 
-        this.methods = {
-            b : this.btn(),
-            setdate : this.setDate,
-        };
-
         layout.title[1].addEventListener('click', function () {
-            self.methods.b.prev(func);
+            btn.prev(func);
         });
 
         layout.title[2].addEventListener('click', function () {
-            self.methods.b.next(func);
+            btn.next(func);
         });
 
         this.render(option, func);  
