@@ -591,17 +591,13 @@ var _cal = (function (cal) {
                 }
 
                 /* chois day of week unable option */
-
-                // layout.col[i][j].classList.remove('unable');
                 if (o.unabledWeek != undefined) { 
                     o.unabledWeek.forEach(function (el) {
                         if(el > 6){ 
                             onError('The unableWeek index is the limit of the 6.'); 
                             return false;
                         }
-                        if(el == j){
-                            layout.col[i][j].classList.add('unable');
-                        }
+                        el == j ? layout.col[i][j].classList.add('unable') : o.unabledDay != true ? layout.col[i][j].classList.remove('unable') : null;
                     })
                 }
 
