@@ -92,11 +92,19 @@
 }
 
 .calendar-body .calendar-title .title-y {
+    background: #fff;
+    border:1px solid #fff;
+    outline: 0;
+    padding: 0;
     font-size:25px;
     color: #000
 }
 
 .calendar-body .calendar-title .title-m {
+    background: #fff;
+    border:1px solid #fff;
+    outline: 0;
+    padding: 0;
     font-size:27px;
     font-weight: 800;
     color: #000

@@ -547,7 +547,7 @@ var _cal = (function (cal) {
         var renderDay = 1;
         var prevRenderDay = sed.startday == 0 ?  sed.prevlastday - 7 : sed.prevlastday - sed.startday;
         var nextRenderDay = 1;
-        var title = "<span class='title-y'>"+yyyy+"</span> <span class='title-m'>"+mm+"</span>";
+        var title = "<button class='title-y'>"+yyyy+"</button> <button class='title-m'>"+mm+"</button>";
 
         o.full = $_td.year+'/'+$_td.month;
         
